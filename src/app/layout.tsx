@@ -29,7 +29,8 @@ export const metadata: Metadata = {
   description:
     "Hello Ana Make — maquiagem, skincare e cosméticos com acabamento premium. Frete para todo o Brasil.",
   icons: {
-    icon: "/logo.png",
+    icon: [{ url: "/favicon.ico" }, { url: "/icon.png", type: "image/png" }],
+    apple: "/apple-icon.png",
   },
 };
 
