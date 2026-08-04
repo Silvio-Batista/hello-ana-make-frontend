@@ -1,0 +1,13 @@
+export { MockProductRepository } from "./product.repository";
+export { MockCategoryRepository } from "./category.repository";
+export { MockCouponRepository } from "./coupon.repository";
+export { MockOrderRepository } from "./order.repository";
+export { MockAddressRepository } from "./address.repository";
+export { MockAuthRepository } from "./auth.repository";
+export { MockRewardRepository } from "./reward.repository";
+export { MockShippingRepository } from "./shipping.repository";
+export { MockPaymentRepository } from "./payment.repository";
+export { MockPromotionRepository } from "./promotion.repository";
+export { MockFavoriteRepository } from "./favorite.repository";
+export { MockBrandRepository } from "./brand.repository";
+export { MockAdminRepository } from "./admin.repository";
