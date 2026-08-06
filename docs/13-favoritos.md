@@ -106,7 +106,7 @@ Resposta de listagem = `ProductListResponse` (ver [01-produtos.md](./01-produtos
 ### `DELETE /api/v1/favorites/{productId}`
 
 **Auth:** cliente  
-**Sucesso `204`
+**Sucesso `204`**
 
 ---
 

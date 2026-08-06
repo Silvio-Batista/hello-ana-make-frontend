@@ -132,7 +132,7 @@ type AddressInput = Omit<Address, "id" | "userId" | "createdAt" | "updatedAt">;
 ### `DELETE /api/v1/addresses/{id}`
 
 **Auth:** cliente  
-**Sucesso `204`
+**Sucesso `204`**
 
 ---
 
