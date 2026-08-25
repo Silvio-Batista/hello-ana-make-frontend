@@ -4,42 +4,59 @@ import type {
   UpdatePromotionInput,
 } from "@/contracts";
 import type { PromotionRepository } from "@/repositories/interfaces";
-import { notImplemented } from "@/repositories/utils";
+import { apiDelete, apiGet, apiPost, apiPut, getOrNull } from "@/lib/http-client";
 
 export class ApiPromotionRepository implements PromotionRepository {
-  listActive(): Promise<Promotion[]> {
-    return notImplemented("ApiPromotionRepository.listActive");
+  async listActive(): Promise<Promotion[]> {
+    const { items } = await apiGet<{ items: Promotion[] }>(
+      "/promotions",
+      undefined,
+      { auth: false },
+    );
+    return items;
   }
 
-  listAll(): Promise<Promotion[]> {
-    return notImplemented("ApiPromotionRepository.listAll");
+  async listAll(): Promise<Promotion[]> {
+    const { items } = await apiGet<{ items: Promotion[] }>(
+      "/promotions",
+      { activeOnly: false },
+      { auth: false },
+    );
+    return items;
   }
 
-  getById(_id: string): Promise<Promotion | null> {
-    return notImplemented("ApiPromotionRepository.getById");
+  async getById(id: string): Promise<Promotion | null> {
+    const items = await this.listAll();
+    return items.find((p) => p.id === id) ?? null;
   }
 
-  getBySlug(_slug: string): Promise<Promotion | null> {
-    return notImplemented("ApiPromotionRepository.getBySlug");
+  getBySlug(slug: string): Promise<Promotion | null> {
+    return getOrNull<Promotion>(`/promotions/${slug}`, undefined, { auth: false });
   }
 
-  getForProduct(_productId: string): Promise<Promotion[]> {
-    return notImplemented("ApiPromotionRepository.getForProduct");
+  async getForProduct(productId: string): Promise<Promotion[]> {
+    const items = await this.listActive();
+    return items.filter(
+      (p) => !p.productIds?.length || p.productIds.includes(productId),
+    );
   }
 
-  getForCategory(_categoryId: string): Promise<Promotion[]> {
-    return notImplemented("ApiPromotionRepository.getForCategory");
+  async getForCategory(categoryId: string): Promise<Promotion[]> {
+    const items = await this.listActive();
+    return items.filter(
+      (p) => !p.categoryIds?.length || p.categoryIds.includes(categoryId),
+    );
   }
 
-  create(_input: CreatePromotionInput): Promise<Promotion> {
-    return notImplemented("ApiPromotionRepository.create");
+  create(input: CreatePromotionInput): Promise<Promotion> {
+    return apiPost<Promotion>("/admin/promotions", input);
   }
 
-  update(_id: string, _input: UpdatePromotionInput): Promise<Promotion> {
-    return notImplemented("ApiPromotionRepository.update");
+  update(id: string, input: UpdatePromotionInput): Promise<Promotion> {
+    return apiPut<Promotion>(`/admin/promotions/${id}`, input);
   }
 
-  remove(_id: string): Promise<void> {
-    return notImplemented("ApiPromotionRepository.remove");
+  async remove(id: string): Promise<void> {
+    await apiDelete(`/admin/promotions/${id}`);
   }
 }

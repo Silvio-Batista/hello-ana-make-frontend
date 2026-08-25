@@ -11,15 +11,20 @@ export interface CheckoutResult {
   payment?: CreatePaymentResponse;
 }
 
+export type CreateOrderPayment = Omit<
+  CreatePaymentRequest,
+  "orderId" | "amount" | "currency" | "method"
+> & {
+  amount?: number;
+  currency?: string;
+};
+
 /**
  * Orquestra a criação do pedido e, opcionalmente, o pagamento inicial.
  */
 export async function createOrder(
   request: CreateOrderRequest,
-  payment?: Omit<CreatePaymentRequest, "orderId" | "amount" | "currency" | "method"> & {
-    amount?: number;
-    currency?: string;
-  },
+  payment?: CreateOrderPayment,
 ): Promise<CheckoutResult> {
   const order = await orderRepository.create(request);
 

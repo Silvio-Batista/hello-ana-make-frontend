@@ -5,9 +5,8 @@ import {
   AlertTriangle,
   Package,
   ShoppingBag,
-  Ticket,
   TrendingUp,
-  Clock,
+  Users,
 } from "lucide-react";
 import {
   DataTable,
@@ -99,45 +98,58 @@ export default function AdminDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatsCard
-          title="Pedidos"
-          value={stats?.totalOrders ?? 0}
-          description={`${stats?.ordersToday ?? 0} hoje`}
+          title="Pedidos (30 dias)"
+          value={stats?.ordersCount ?? 0}
+          description={`${stats?.ordersPaidCount ?? 0} pagos`}
           icon={<ShoppingBag className="size-5" />}
           loading={statsLoading}
         />
         <StatsCard
-          title="Receita do mês"
-          value={formatCurrency(stats?.revenueMonth ?? 0)}
-          description={`Total: ${formatCurrency(stats?.revenueTotal ?? 0)}`}
+          title="Receita"
+          value={formatCurrency(stats?.revenue ?? 0)}
+          description={`Ticket médio: ${formatCurrency(stats?.averageTicket ?? 0)}`}
           icon={<TrendingUp className="size-5" />}
           loading={statsLoading}
         />
         <StatsCard
-          title="Produtos"
-          value={stats?.productsCount ?? 0}
-          icon={<Package className="size-5" />}
+          title="Novos clientes"
+          value={stats?.newCustomers ?? 0}
+          icon={<Users className="size-5" />}
           loading={statsLoading}
         />
         <StatsCard
           title="Estoque baixo"
-          value={stats?.lowStockCount ?? 0}
+          value={stats?.productsLowStock ?? 0}
           icon={<AlertTriangle className="size-5" />}
           loading={statsLoading}
         />
-        <StatsCard
-          title="Pendentes"
-          value={stats?.pendingOrders ?? 0}
-          icon={<Clock className="size-5" />}
-          loading={statsLoading}
-        />
-        <StatsCard
-          title="Cupons ativos"
-          value={stats?.activeCoupons ?? 0}
-          description={`${stats?.activePromotions ?? 0} promoções ativas`}
-          icon={<Ticket className="size-5" />}
-          loading={statsLoading}
-        />
       </div>
+
+      {stats?.topProducts.length ? (
+        <div className="mt-8">
+          <h2 className="mb-4 text-lg font-semibold text-text-primary">
+            Mais vendidos
+          </h2>
+          <div className="rounded-xl border border-border bg-white p-4">
+            <ul className="divide-y divide-border">
+              {stats.topProducts.map((product) => (
+                <li
+                  key={product.productId}
+                  className="flex items-center justify-between py-2 text-sm"
+                >
+                  <span className="flex items-center gap-2 text-text-primary">
+                    <Package className="size-4 text-text-secondary" aria-hidden />
+                    {product.name}
+                  </span>
+                  <span className="font-medium text-text-secondary">
+                    {product.unitsSold} un.
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-8">
         <div className="mb-4 flex items-center justify-between">

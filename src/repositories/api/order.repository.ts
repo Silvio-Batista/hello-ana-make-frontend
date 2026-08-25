@@ -1,6 +1,7 @@
 import type {
   AdminOrderListParams,
   CreateOrderRequest,
+  CreatePaymentResponse,
   Order,
   UpdateOrderStatusRequest,
 } from "@/contracts";
@@ -9,37 +10,49 @@ import type {
   OrderListResponse,
   OrderRepository,
 } from "@/repositories/interfaces";
-import { notImplemented } from "@/repositories/utils";
+import { apiGet, apiPatch, apiPost, getOrNull } from "@/lib/http-client";
 
 export class ApiOrderRepository implements OrderRepository {
-  create(_request: CreateOrderRequest): Promise<Order> {
-    return notImplemented("ApiOrderRepository.create");
+  async create(request: CreateOrderRequest): Promise<Order> {
+    const { order } = await apiPost<{ order: Order; payment?: CreatePaymentResponse }>(
+      "/orders",
+      request,
+    );
+    return order;
   }
 
-  getById(_id: string): Promise<Order | null> {
-    return notImplemented("ApiOrderRepository.getById");
+  getById(id: string): Promise<Order | null> {
+    return getOrNull<Order>(`/orders/${id}`);
   }
 
-  getByOrderNumber(_orderNumber: string): Promise<Order | null> {
-    return notImplemented("ApiOrderRepository.getByOrderNumber");
+  getByOrderNumber(orderNumber: string): Promise<Order | null> {
+    return getOrNull<Order>(`/orders/by-number/${orderNumber}`);
   }
 
-  listMine(_params?: OrderListParams): Promise<OrderListResponse> {
-    return notImplemented("ApiOrderRepository.listMine");
+  listMine(params: OrderListParams = {}): Promise<OrderListResponse> {
+    return apiGet<OrderListResponse>("/orders", {
+      page: params.page,
+      pageSize: params.pageSize,
+      status: params.status,
+    });
   }
 
-  cancel(_id: string, _reason?: string): Promise<Order> {
-    return notImplemented("ApiOrderRepository.cancel");
+  cancel(id: string, reason?: string): Promise<Order> {
+    return apiPost<Order>(`/orders/${id}/cancel`, { reason });
   }
 
-  listAll(_params?: AdminOrderListParams): Promise<OrderListResponse> {
-    return notImplemented("ApiOrderRepository.listAll");
+  listAll(params: AdminOrderListParams = {}): Promise<OrderListResponse> {
+    return apiGet<OrderListResponse>("/admin/orders", {
+      page: params.page,
+      pageSize: params.pageSize,
+      status: params.status,
+      search: params.search,
+      from: params.from,
+      to: params.to,
+    });
   }
 
-  updateStatus(
-    _id: string,
-    _request: UpdateOrderStatusRequest,
-  ): Promise<Order> {
-    return notImplemented("ApiOrderRepository.updateStatus");
+  updateStatus(id: string, request: UpdateOrderStatusRequest): Promise<Order> {
+    return apiPatch<Order>(`/admin/orders/${id}/status`, request);
   }
 }

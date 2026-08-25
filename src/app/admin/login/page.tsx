@@ -4,12 +4,14 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button, Input } from "@/components/ui";
+import { adminRepository } from "@/lib/container";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/stores";
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const setSession = useAuthStore((s) => s.setSession);
+  const logoutStore = useAuthStore((s) => s.logout);
 
   const [email, setEmail] = useState("admin@helloana.make");
   const [password, setPassword] = useState("");
@@ -28,12 +30,23 @@ export default function AdminLoginPage() {
         rememberMe: true,
       });
 
-      if (session.user.role !== "admin") {
+      if (session.user.role !== undefined && session.user.role !== "admin") {
         setError("Acesso restrito a administradores");
         return;
       }
 
       setSession(session);
+
+      if (session.user.role === undefined) {
+        try {
+          await adminRepository.getDashboardStats();
+        } catch {
+          logoutStore();
+          setError("Acesso restrito a administradores");
+          return;
+        }
+      }
+
       router.replace("/admin");
     } catch (err) {
       setError(

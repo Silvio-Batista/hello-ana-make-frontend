@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CreateOrderRequest } from "@/contracts";
 import type { OrderListParams } from "@/repositories/interfaces";
 import { orderRepository } from "@/lib/container";
-import { checkoutService } from "@/services/checkout.service";
+import { checkoutService, type CreateOrderPayment } from "@/services/checkout.service";
 
 export const orderKeys = {
   all: ["orders"] as const,
@@ -42,7 +42,13 @@ export function useCreateOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: CreateOrderRequest) => checkoutService.createOrder(request),
+    mutationFn: ({
+      request,
+      payment,
+    }: {
+      request: CreateOrderRequest;
+      payment?: CreateOrderPayment;
+    }) => checkoutService.createOrder(request, payment),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: orderKeys.all });
     },

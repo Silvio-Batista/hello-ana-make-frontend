@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Order } from "@/contracts";
+import type { CreatePaymentResponse, Order } from "@/contracts";
 import {
   AddressStep,
   CheckoutOrderSummary,
@@ -48,6 +48,7 @@ export default function CheckoutPage() {
   const createOrder = useCreateOrder();
 
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
+  const [confirmedPayment, setConfirmedPayment] = useState<CreatePaymentResponse | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -87,21 +88,25 @@ export default function CheckoutPage() {
       }
 
       const result = await createOrder.mutateAsync({
-        items: items.map((item) => ({
-          productId: item.productId,
-          variantId: item.variantId,
-          quantity: item.quantity,
-        })),
-        shippingAddressId,
-        shippingOptionId,
-        paymentMethod,
-        couponCode: couponCode ?? undefined,
-        notes: notes.trim() || undefined,
+        request: {
+          items: items.map((item) => ({
+            productId: item.productId,
+            variantId: item.variantId,
+            quantity: item.quantity,
+          })),
+          shippingAddressId,
+          shippingOptionId,
+          paymentMethod,
+          couponCode: couponCode ?? undefined,
+          notes: notes.trim() || undefined,
+        },
+        payment: paymentMethod === "pix" || paymentMethod === "boleto" ? {} : undefined,
       });
 
       clearCart();
       resetCheckout();
       setConfirmedOrder(result.order);
+      setConfirmedPayment(result.payment ?? null);
       setStep(5);
 
       if (isAuthenticated) {
@@ -131,7 +136,7 @@ export default function CheckoutPage() {
         <PageHeader title="Checkout" description="Pedido realizado com sucesso" />
         <Container className="py-8 md:py-10">
           <CheckoutSteps current={5} className="mb-8" />
-          <ConfirmationStep order={confirmedOrder} />
+          <ConfirmationStep order={confirmedOrder} payment={confirmedPayment ?? undefined} />
         </Container>
       </>
     );
@@ -159,7 +164,7 @@ export default function CheckoutPage() {
               />
             ) : null}
             {step === 5 && confirmedOrder ? (
-              <ConfirmationStep order={confirmedOrder} />
+              <ConfirmationStep order={confirmedOrder} payment={confirmedPayment ?? undefined} />
             ) : null}
           </div>
 

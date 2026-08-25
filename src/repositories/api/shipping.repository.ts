@@ -6,11 +6,20 @@ import type {
   ShippingQuoteResponse,
 } from "@/contracts";
 import type { ShippingRepository } from "@/repositories/interfaces";
+import { apiPost } from "@/lib/http-client";
 import { notImplemented } from "@/repositories/utils";
 
+function quote(request: ShippingQuoteRequest): Promise<ShippingQuoteResponse> {
+  return apiPost<ShippingQuoteResponse>(
+    "/shipping/quote",
+    { zipCode: request.zipCode, subtotal: request.subtotal },
+    { auth: false },
+  );
+}
+
 export class ApiShippingRepository implements ShippingRepository {
-  quote(_request: ShippingQuoteRequest): Promise<ShippingQuoteResponse> {
-    return notImplemented("ApiShippingRepository.quote");
+  quote(request: ShippingQuoteRequest): Promise<ShippingQuoteResponse> {
+    return quote(request);
   }
 
   createShipment(_request: ShipmentRequest): Promise<ShipmentResponse> {
@@ -26,14 +35,14 @@ export class ApiShippingRepository implements ShippingRepository {
   }
 }
 
-/** Stub SuperFrete — configure API Laravel / integração SuperFrete. */
+/** SuperFrete real ainda não exposto pelo backend — quote() usa o mock fixo do backend (ver AGENTS.md §7). */
 export class SuperFreteShippingRepository
   implements ShippingRepository, ShippingProvider
 {
   readonly name = "SuperFrete";
 
-  quote(_request: ShippingQuoteRequest): Promise<ShippingQuoteResponse> {
-    return notImplemented("SuperFreteShippingRepository.quote");
+  quote(request: ShippingQuoteRequest): Promise<ShippingQuoteResponse> {
+    return quote(request);
   }
 
   createShipment(_request: ShipmentRequest): Promise<ShipmentResponse> {

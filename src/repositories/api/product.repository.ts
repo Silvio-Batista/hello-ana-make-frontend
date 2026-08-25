@@ -6,53 +6,97 @@ import type {
   UpdateProductInput,
 } from "@/contracts";
 import type { ProductRepository } from "@/repositories/interfaces";
-import { notImplemented } from "@/repositories/utils";
+import { apiDelete, apiGet, apiPost, apiPut, getOrNull, type QueryParams } from "@/lib/http-client";
+
+function toProductQuery(params?: ProductListParams): QueryParams {
+  const f = params?.filters;
+  return {
+    page: params?.page,
+    pageSize: params?.pageSize,
+    sortBy: params?.sortBy,
+    categoryIds: f?.categoryIds,
+    brandIds: f?.brandIds,
+    priceMin: f?.priceMin,
+    priceMax: f?.priceMax,
+    ratingMin: f?.ratingMin,
+    inStockOnly: f?.inStockOnly,
+    isFeatured: f?.isFeatured,
+    isNew: f?.isNew,
+    isBestseller: f?.isBestseller,
+    onSale: f?.onSale,
+    search: f?.search,
+    colors: f?.colors,
+  };
+}
 
 export class ApiProductRepository implements ProductRepository {
-  list(_params?: ProductListParams): Promise<ProductListResponse> {
-    return notImplemented("ApiProductRepository.list");
+  list(params?: ProductListParams): Promise<ProductListResponse> {
+    return apiGet<ProductListResponse>("/products", toProductQuery(params), {
+      auth: false,
+    });
   }
 
-  getById(_id: string): Promise<Product | null> {
-    return notImplemented("ApiProductRepository.getById");
+  async getById(id: string): Promise<Product | null> {
+    const { items } = await apiGet<ProductListResponse>("/admin/products", {
+      includeInactive: true,
+      pageSize: 100,
+    });
+    return items.find((p) => p.id === id) ?? null;
   }
 
-  getBySlug(_slug: string): Promise<Product | null> {
-    return notImplemented("ApiProductRepository.getBySlug");
+  getBySlug(slug: string): Promise<Product | null> {
+    return getOrNull<Product>(`/products/${slug}`, undefined, { auth: false });
   }
 
-  getFeatured(_limit?: number): Promise<Product[]> {
-    return notImplemented("ApiProductRepository.getFeatured");
+  async getFeatured(limit = 8): Promise<Product[]> {
+    const { items } = await this.list({ pageSize: limit, filters: { isFeatured: true } });
+    return items;
   }
 
-  getNewArrivals(_limit?: number): Promise<Product[]> {
-    return notImplemented("ApiProductRepository.getNewArrivals");
+  async getNewArrivals(limit = 8): Promise<Product[]> {
+    const { items } = await this.list({
+      pageSize: limit,
+      sortBy: "newest",
+      filters: { isNew: true },
+    });
+    return items;
   }
 
-  getBestsellers(_limit?: number): Promise<Product[]> {
-    return notImplemented("ApiProductRepository.getBestsellers");
+  async getBestsellers(limit = 8): Promise<Product[]> {
+    const { items } = await this.list({
+      pageSize: limit,
+      sortBy: "bestseller",
+      filters: { isBestseller: true },
+    });
+    return items;
   }
 
-  getRelated(_productId: string, _limit?: number): Promise<Product[]> {
-    return notImplemented("ApiProductRepository.getRelated");
+  async getRelated(productId: string, limit = 8): Promise<Product[]> {
+    const { items } = await apiGet<{ items: Product[] }>(
+      `/products/${productId}/related`,
+      { limit },
+      { auth: false },
+    );
+    return items;
   }
 
-  search(
-    _query: string,
-    _params?: ProductListParams,
-  ): Promise<ProductListResponse> {
-    return notImplemented("ApiProductRepository.search");
+  search(query: string, params?: ProductListParams): Promise<ProductListResponse> {
+    return apiGet<ProductListResponse>(
+      "/products",
+      { ...toProductQuery(params), search: query },
+      { auth: false },
+    );
   }
 
-  create(_input: CreateProductInput): Promise<Product> {
-    return notImplemented("ApiProductRepository.create");
+  create(input: CreateProductInput): Promise<Product> {
+    return apiPost<Product>("/admin/products", input);
   }
 
-  update(_id: string, _input: UpdateProductInput): Promise<Product> {
-    return notImplemented("ApiProductRepository.update");
+  update(id: string, input: UpdateProductInput): Promise<Product> {
+    return apiPut<Product>(`/admin/products/${id}`, input);
   }
 
-  remove(_id: string): Promise<void> {
-    return notImplemented("ApiProductRepository.remove");
+  async remove(id: string): Promise<void> {
+    await apiDelete(`/admin/products/${id}`);
   }
 }

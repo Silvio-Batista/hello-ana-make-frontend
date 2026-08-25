@@ -10,18 +10,20 @@ import type { Promotion } from "./promotion.contract";
 import type { CartRewardGift } from "./reward.contract";
 
 /**
- * Métricas do painel administrativo.
+ * Métricas do painel administrativo (GET /admin/dashboard).
  */
 export interface AdminDashboardStats {
-  totalOrders: number;
-  ordersToday: number;
-  revenueTotal: number;
-  revenueMonth: number;
-  productsCount: number;
-  lowStockCount: number;
-  pendingOrders: number;
-  activeCoupons: number;
-  activePromotions: number;
+  period: { from: string; to: string };
+  ordersCount: number;
+  /** Pedidos com status paid|processing|shipped|in_transit|delivered. */
+  ordersPaidCount: number;
+  revenue: number;
+  averageTicket: number;
+  newCustomers: number;
+  /** Produtos ativos com 0 < estoque <= 5. */
+  productsLowStock: number;
+  ordersByStatus: Record<OrderStatus, number>;
+  topProducts: { productId: string; name: string; unitsSold: number }[];
 }
 
 /**
@@ -121,17 +123,59 @@ export interface CreateRewardTierInput {
 export interface UpdateRewardTierInput extends Partial<CreateRewardTierInput> {}
 
 /**
- * Configurações gerais da loja.
+ * Chaves/segredos de integração — vêm mascarados do backend (ex.: "asaas_****"),
+ * nunca em texto puro. Atualizados via PATCH /admin/settings/integrations (substituição direta).
+ */
+export interface StoreIntegrationsSettings {
+  paymentGateway: string;
+  shippingProvider: string;
+  asaasApiKey?: string;
+  superfreteToken?: string;
+}
+
+/**
+ * Configurações gerais da loja (GET/PUT /admin/settings).
  */
 export interface StoreSettings {
-  storeName: string;
-  freeShippingMinimum: number;
-  announcementText: string;
-  announcementEnabled: boolean;
-  signupDiscountPercentage: number;
-  signupCouponPrefix: string;
-  contactEmail: string;
-  contactWhatsapp?: string;
-  instagramUrl?: string;
+  store: {
+    name: string;
+    legalName?: string;
+    document?: string;
+    email: string;
+    phone?: string;
+    instagramUrl?: string;
+  };
+  checkout: {
+    enabledPaymentMethods: string[];
+    maxInstallments: number;
+    minInstallmentAmount: number;
+    allowGuestCheckout: boolean;
+  };
+  shipping: {
+    originZipCode: string;
+    defaultWeightGrams: number;
+    defaultWidthCm: number;
+    defaultHeightCm: number;
+    defaultLengthCm: number;
+    /** Valor mínimo para frete grátis por serviço; null/undefined = sem frete grátis. */
+    freeShippingThresholds: {
+      PAC?: number | null;
+      SEDEX?: number | null;
+      EXPRESSA?: number | null;
+    };
+  };
+  rewards: {
+    enabled: boolean;
+  };
+  signupPromotion: {
+    enabled: boolean;
+    couponCode: string;
+    discountPercentage: number;
+    message: string;
+    expiresAt?: string;
+  };
+  integrations: StoreIntegrationsSettings;
   currency: string;
+  timezone: string;
+  updatedAt: string;
 }

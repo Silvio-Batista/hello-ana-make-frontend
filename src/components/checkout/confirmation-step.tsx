@@ -1,17 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, Package } from "lucide-react";
-import type { Order } from "@/contracts";
+import { CheckCircle2, FileText, Package } from "lucide-react";
+import type { CreatePaymentResponse, Order } from "@/contracts";
 import { Button } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
 import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS } from "@/lib/order-status";
 
 export interface ConfirmationStepProps {
   order: Order;
+  payment?: CreatePaymentResponse;
 }
 
-export function ConfirmationStep({ order }: ConfirmationStepProps) {
+function formatExpiry(iso: string): string {
+  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(
+    new Date(iso),
+  );
+}
+
+export function ConfirmationStep({ order, payment }: ConfirmationStepProps) {
   return (
     <div className="rounded-2xl border border-border bg-white p-6 text-center sm:p-8">
       <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-success/10 text-success">
@@ -43,6 +50,51 @@ export function ConfirmationStep({ order }: ConfirmationStepProps) {
           </div>
         </div>
       </div>
+
+      {payment?.method === "pix" && payment.status !== "paid" ? (
+        <div className="mx-auto mt-6 max-w-md rounded-xl border border-border bg-surface/60 p-4 text-left">
+          <p className="text-sm font-semibold text-text-primary">Pague com PIX</p>
+          {payment.pixQrCodeUrl ? (
+            <img
+              src={payment.pixQrCodeUrl}
+              alt="QR Code PIX"
+              className="mx-auto mt-3 size-40 rounded-lg border border-border bg-white p-2"
+            />
+          ) : null}
+          {payment.pixQrCode ? (
+            <code className="mt-3 block break-all rounded-lg bg-white p-3 text-xs text-text-secondary">
+              {payment.pixQrCode}
+            </code>
+          ) : null}
+          {payment.pixExpiresAt ? (
+            <p className="mt-2 text-xs text-text-secondary">
+              Expira em {formatExpiry(payment.pixExpiresAt)}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {payment?.method === "boleto" && payment.status !== "paid" ? (
+        <div className="mx-auto mt-6 max-w-md rounded-xl border border-border bg-surface/60 p-4 text-left">
+          <p className="text-sm font-semibold text-text-primary">Boleto bancário</p>
+          {payment.boletoBarcode ? (
+            <code className="mt-3 block break-all rounded-lg bg-white p-3 text-xs text-text-secondary">
+              {payment.boletoBarcode}
+            </code>
+          ) : null}
+          {payment.boletoUrl ? (
+            <a
+              href={payment.boletoUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+            >
+              <FileText className="size-4" aria-hidden />
+              Visualizar boleto
+            </a>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link href={`/conta/pedidos/${order.id}`}>

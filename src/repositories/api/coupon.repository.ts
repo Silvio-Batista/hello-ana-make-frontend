@@ -5,38 +5,44 @@ import type {
   UpdateCouponInput,
 } from "@/contracts";
 import type { CouponRepository } from "@/repositories/interfaces";
-import { notImplemented } from "@/repositories/utils";
+import { apiDelete, apiGet, apiPost, apiPut, getOrNull } from "@/lib/http-client";
 
 export class ApiCouponRepository implements CouponRepository {
-  getByCode(_code: string): Promise<Coupon | null> {
-    return notImplemented("ApiCouponRepository.getByCode");
+  getByCode(code: string): Promise<Coupon | null> {
+    return getOrNull<Coupon>(`/coupons/${code}`, undefined, { auth: false });
   }
 
   validate(
-    _code: string,
-    _cartSubtotal: number,
-    _productIds?: string[],
+    code: string,
+    cartSubtotal: number,
+    productIds?: string[],
   ): Promise<CouponValidationResult> {
-    return notImplemented("ApiCouponRepository.validate");
+    return apiPost<CouponValidationResult>(
+      "/coupons/validate",
+      { code, cartSubtotal, productIds },
+      { auth: false },
+    );
   }
 
-  list(): Promise<Coupon[]> {
-    return notImplemented("ApiCouponRepository.list");
+  async list(): Promise<Coupon[]> {
+    const { items } = await apiGet<{ items: Coupon[] }>("/admin/coupons");
+    return items;
   }
 
-  getById(_id: string): Promise<Coupon | null> {
-    return notImplemented("ApiCouponRepository.getById");
+  async getById(id: string): Promise<Coupon | null> {
+    const items = await this.list();
+    return items.find((c) => c.id === id) ?? null;
   }
 
-  create(_input: CreateCouponInput): Promise<Coupon> {
-    return notImplemented("ApiCouponRepository.create");
+  create(input: CreateCouponInput): Promise<Coupon> {
+    return apiPost<Coupon>("/admin/coupons", input);
   }
 
-  update(_id: string, _input: UpdateCouponInput): Promise<Coupon> {
-    return notImplemented("ApiCouponRepository.update");
+  update(id: string, input: UpdateCouponInput): Promise<Coupon> {
+    return apiPut<Coupon>(`/admin/coupons/${id}`, input);
   }
 
-  remove(_id: string): Promise<void> {
-    return notImplemented("ApiCouponRepository.remove");
+  async remove(id: string): Promise<void> {
+    await apiDelete(`/admin/coupons/${id}`);
   }
 }

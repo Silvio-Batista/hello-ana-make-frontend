@@ -4,38 +4,45 @@ import type {
   UpdateCategoryInput,
 } from "@/contracts";
 import type { CategoryRepository } from "@/repositories/interfaces";
-import { notImplemented } from "@/repositories/utils";
+import { apiDelete, apiGet, apiPost, apiPut, getOrNull } from "@/lib/http-client";
 
 export class ApiCategoryRepository implements CategoryRepository {
-  list(): Promise<Category[]> {
-    return notImplemented("ApiCategoryRepository.list");
+  async list(): Promise<Category[]> {
+    const { items } = await apiGet<{ items: Category[] }>(
+      "/categories",
+      { tree: false },
+      { auth: false },
+    );
+    return items;
   }
 
-  getById(_id: string): Promise<Category | null> {
-    return notImplemented("ApiCategoryRepository.getById");
+  async getById(id: string): Promise<Category | null> {
+    const items = await this.list();
+    return items.find((c) => c.id === id) ?? null;
   }
 
-  getBySlug(_slug: string): Promise<Category | null> {
-    return notImplemented("ApiCategoryRepository.getBySlug");
+  getBySlug(slug: string): Promise<Category | null> {
+    return getOrNull<Category>(`/categories/${slug}`, undefined, { auth: false });
   }
 
-  getChildren(_parentId: string): Promise<Category[]> {
-    return notImplemented("ApiCategoryRepository.getChildren");
+  async getChildren(parentId: string): Promise<Category[]> {
+    const items = await this.list();
+    return items.filter((c) => c.parentId === parentId);
   }
 
-  getTree(): Promise<Category[]> {
-    return notImplemented("ApiCategoryRepository.getTree");
+  async getTree(): Promise<Category[]> {
+    return this.list();
   }
 
-  create(_input: CreateCategoryInput): Promise<Category> {
-    return notImplemented("ApiCategoryRepository.create");
+  create(input: CreateCategoryInput): Promise<Category> {
+    return apiPost<Category>("/admin/categories", input);
   }
 
-  update(_id: string, _input: UpdateCategoryInput): Promise<Category> {
-    return notImplemented("ApiCategoryRepository.update");
+  update(id: string, input: UpdateCategoryInput): Promise<Category> {
+    return apiPut<Category>(`/admin/categories/${id}`, input);
   }
 
-  remove(_id: string): Promise<void> {
-    return notImplemented("ApiCategoryRepository.remove");
+  async remove(id: string): Promise<void> {
+    await apiDelete(`/admin/categories/${id}`);
   }
 }
