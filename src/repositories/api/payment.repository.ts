@@ -4,28 +4,24 @@ import type {
   PaymentGateway,
 } from "@/contracts";
 import type { PaymentRepository } from "@/repositories/interfaces";
+import { apiGet, apiPost } from "@/lib/http-client";
 import { notImplemented } from "@/repositories/utils";
 
 export class ApiPaymentRepository implements PaymentRepository {
-  createPayment(
-    _request: CreatePaymentRequest,
-  ): Promise<CreatePaymentResponse> {
-    return notImplemented("ApiPaymentRepository.createPayment");
+  createPayment(request: CreatePaymentRequest): Promise<CreatePaymentResponse> {
+    return apiPost<CreatePaymentResponse>("/payments", request);
   }
 
-  getPaymentStatus(_paymentId: string): Promise<CreatePaymentResponse> {
-    return notImplemented("ApiPaymentRepository.getPaymentStatus");
+  getPaymentStatus(paymentId: string): Promise<CreatePaymentResponse> {
+    return apiGet<CreatePaymentResponse>(`/payments/${paymentId}`);
   }
 
-  refundPayment(
-    _paymentId: string,
-    _amount?: number,
-  ): Promise<CreatePaymentResponse> {
-    return notImplemented("ApiPaymentRepository.refundPayment");
+  refundPayment(paymentId: string, amount?: number): Promise<CreatePaymentResponse> {
+    return apiPost<CreatePaymentResponse>(`/payments/${paymentId}/refund`, { amount });
   }
 
-  cancelPayment(_paymentId: string): Promise<CreatePaymentResponse> {
-    return notImplemented("ApiPaymentRepository.cancelPayment");
+  cancelPayment(paymentId: string): Promise<CreatePaymentResponse> {
+    return apiPost<CreatePaymentResponse>(`/payments/${paymentId}/cancel`);
   }
 }
 

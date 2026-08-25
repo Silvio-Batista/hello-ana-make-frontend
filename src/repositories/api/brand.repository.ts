@@ -4,26 +4,30 @@ import type {
   UpdateBrandInput,
 } from "@/contracts";
 import type { BrandRepository } from "@/repositories/interfaces";
-import { notImplemented } from "@/repositories/utils";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/http-client";
 
 export class ApiBrandRepository implements BrandRepository {
-  list(): Promise<Brand[]> {
-    return notImplemented("ApiBrandRepository.list");
+  async list(): Promise<Brand[]> {
+    const { items } = await apiGet<{ items: Brand[] }>("/brands", undefined, {
+      auth: false,
+    });
+    return items;
   }
 
-  getById(_id: string): Promise<Brand | null> {
-    return notImplemented("ApiBrandRepository.getById");
+  async getById(id: string): Promise<Brand | null> {
+    const items = await this.list();
+    return items.find((b) => b.id === id) ?? null;
   }
 
-  create(_input: CreateBrandInput): Promise<Brand> {
-    return notImplemented("ApiBrandRepository.create");
+  create(input: CreateBrandInput): Promise<Brand> {
+    return apiPost<Brand>("/admin/brands", input);
   }
 
-  update(_id: string, _input: UpdateBrandInput): Promise<Brand> {
-    return notImplemented("ApiBrandRepository.update");
+  update(id: string, input: UpdateBrandInput): Promise<Brand> {
+    return apiPut<Brand>(`/admin/brands/${id}`, input);
   }
 
-  remove(_id: string): Promise<void> {
-    return notImplemented("ApiBrandRepository.remove");
+  async remove(id: string): Promise<void> {
+    await apiDelete(`/admin/brands/${id}`);
   }
 }

@@ -23,12 +23,6 @@ import { delay } from "@/repositories/utils";
 let orderStore = seedOrders;
 let orderSeq = seedOrders.length + 1;
 
-const PENDING_STATUSES = new Set([
-  "pending_payment",
-  "paid",
-  "processing",
-]);
-
 function matchesAdminSearch(order: Order, search: string): boolean {
   const q = search.toLowerCase().trim();
   if (!q) return true;
@@ -61,10 +55,6 @@ function paginateOrders(
 /** Exposto para o admin calcular métricas no mesmo store. */
 export function getMockOrderStore(): Order[] {
   return orderStore;
-}
-
-export function countPendingOrders(): number {
-  return orderStore.filter((o) => PENDING_STATUSES.has(o.status)).length;
 }
 
 export class MockOrderRepository implements OrderRepository {

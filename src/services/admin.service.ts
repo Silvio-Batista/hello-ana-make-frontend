@@ -6,6 +6,7 @@ import type {
   CreatePromotionInput,
   Order,
   Promotion,
+  StoreIntegrationsSettings,
   StoreSettings,
   UpdateCategoryInput,
   UpdateOrderStatusRequest,
@@ -28,8 +29,16 @@ export const adminService = {
     return adminRepository.getSettings();
   },
 
-  updateSettings(input: Partial<StoreSettings>): Promise<StoreSettings> {
+  updateSettings(
+    input: Partial<Omit<StoreSettings, "integrations" | "updatedAt">>,
+  ): Promise<StoreSettings> {
     return adminRepository.updateSettings(input);
+  },
+
+  updateIntegrations(
+    input: Partial<StoreIntegrationsSettings>,
+  ): Promise<StoreIntegrationsSettings & { updatedAt: string }> {
+    return adminRepository.updateIntegrations(input);
   },
 
   listOrders(params?: AdminOrderListParams): Promise<OrderListResponse> {

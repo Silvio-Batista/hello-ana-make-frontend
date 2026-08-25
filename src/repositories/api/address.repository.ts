@@ -3,30 +3,31 @@ import type {
   AddressInput,
   AddressRepository,
 } from "@/repositories/interfaces";
-import { notImplemented } from "@/repositories/utils";
+import { apiDelete, apiGet, apiPost, apiPut, getOrNull } from "@/lib/http-client";
 
 export class ApiAddressRepository implements AddressRepository {
-  list(): Promise<Address[]> {
-    return notImplemented("ApiAddressRepository.list");
+  async list(): Promise<Address[]> {
+    const { items } = await apiGet<{ items: Address[] }>("/addresses");
+    return items;
   }
 
-  getById(_id: string): Promise<Address | null> {
-    return notImplemented("ApiAddressRepository.getById");
+  getById(id: string): Promise<Address | null> {
+    return getOrNull<Address>(`/addresses/${id}`);
   }
 
-  create(_data: AddressInput): Promise<Address> {
-    return notImplemented("ApiAddressRepository.create");
+  create(data: AddressInput): Promise<Address> {
+    return apiPost<Address>("/addresses", data);
   }
 
-  update(_id: string, _data: Partial<AddressInput>): Promise<Address> {
-    return notImplemented("ApiAddressRepository.update");
+  update(id: string, data: Partial<AddressInput>): Promise<Address> {
+    return apiPut<Address>(`/addresses/${id}`, data);
   }
 
-  remove(_id: string): Promise<void> {
-    return notImplemented("ApiAddressRepository.remove");
+  async remove(id: string): Promise<void> {
+    await apiDelete(`/addresses/${id}`);
   }
 
-  setDefault(_id: string): Promise<Address> {
-    return notImplemented("ApiAddressRepository.setDefault");
+  setDefault(id: string): Promise<Address> {
+    return apiPost<Address>(`/addresses/${id}/default`);
   }
 }

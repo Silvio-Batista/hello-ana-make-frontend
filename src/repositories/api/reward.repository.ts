@@ -5,29 +5,35 @@ import type {
   UpdateRewardTierInput,
 } from "@/contracts";
 import type { RewardRepository } from "@/repositories/interfaces";
-import { notImplemented } from "@/repositories/utils";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/http-client";
 
 export class ApiRewardRepository implements RewardRepository {
-  getTiers(): Promise<RewardTier[]> {
-    return notImplemented("ApiRewardRepository.getTiers");
+  async getTiers(): Promise<RewardTier[]> {
+    const { items } = await apiGet<{ items: RewardTier[] }>(
+      "/rewards/tiers",
+      undefined,
+      { auth: false },
+    );
+    return items;
   }
 
-  getProgress(_eligibleAmount: number): Promise<RewardProgress> {
-    return notImplemented("ApiRewardRepository.getProgress");
+  getProgress(eligibleAmount: number): Promise<RewardProgress> {
+    return apiGet<RewardProgress>(
+      "/rewards/progress",
+      { eligibleAmount },
+      { auth: false },
+    );
   }
 
-  createTier(_input: CreateRewardTierInput): Promise<RewardTier> {
-    return notImplemented("ApiRewardRepository.createTier");
+  createTier(input: CreateRewardTierInput): Promise<RewardTier> {
+    return apiPost<RewardTier>("/admin/reward-tiers", input);
   }
 
-  updateTier(
-    _id: string,
-    _input: UpdateRewardTierInput,
-  ): Promise<RewardTier> {
-    return notImplemented("ApiRewardRepository.updateTier");
+  updateTier(id: string, input: UpdateRewardTierInput): Promise<RewardTier> {
+    return apiPut<RewardTier>(`/admin/reward-tiers/${id}`, input);
   }
 
-  removeTier(_id: string): Promise<void> {
-    return notImplemented("ApiRewardRepository.removeTier");
+  async removeTier(id: string): Promise<void> {
+    await apiDelete(`/admin/reward-tiers/${id}`);
   }
 }

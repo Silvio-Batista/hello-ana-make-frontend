@@ -1,25 +1,33 @@
 import type { ProductListParams, ProductListResponse } from "@/contracts";
 import type { FavoriteRepository } from "@/repositories/interfaces";
-import { notImplemented } from "@/repositories/utils";
+import { apiDelete, apiGet, apiPost } from "@/lib/http-client";
 
 export class ApiFavoriteRepository implements FavoriteRepository {
-  list(_params?: ProductListParams): Promise<ProductListResponse> {
-    return notImplemented("ApiFavoriteRepository.list");
+  list(params?: ProductListParams): Promise<ProductListResponse> {
+    return apiGet<ProductListResponse>("/favorites", {
+      page: params?.page,
+      pageSize: params?.pageSize,
+      sortBy: params?.sortBy,
+    });
   }
 
-  add(_productId: string): Promise<void> {
-    return notImplemented("ApiFavoriteRepository.add");
+  async add(productId: string): Promise<void> {
+    await apiPost(`/favorites/${productId}`);
   }
 
-  remove(_productId: string): Promise<void> {
-    return notImplemented("ApiFavoriteRepository.remove");
+  async remove(productId: string): Promise<void> {
+    await apiDelete(`/favorites/${productId}`);
   }
 
-  has(_productId: string): Promise<boolean> {
-    return notImplemented("ApiFavoriteRepository.has");
+  async has(productId: string): Promise<boolean> {
+    const { isFavorite } = await apiGet<{ isFavorite: boolean }>(
+      `/favorites/${productId}/check`,
+    );
+    return isFavorite;
   }
 
-  getIds(): Promise<string[]> {
-    return notImplemented("ApiFavoriteRepository.getIds");
+  async getIds(): Promise<string[]> {
+    const { ids } = await apiGet<{ ids: string[] }>("/favorites/ids");
+    return ids;
   }
 }

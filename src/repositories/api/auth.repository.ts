@@ -7,51 +7,71 @@ import type {
   User,
 } from "@/contracts";
 import type { AuthRepository } from "@/repositories/interfaces";
-import { notImplemented } from "@/repositories/utils";
+import { apiGet, apiPatch, apiPost, ApiError } from "@/lib/http-client";
+import { useAuthStore } from "@/stores/auth.store";
+
+interface RawSignupPromotion {
+  success: boolean;
+  message: string;
+  couponCode?: string;
+  discountPercentage?: number;
+}
 
 export class ApiAuthRepository implements AuthRepository {
-  login(_request: LoginRequest): Promise<AuthSession> {
-    return notImplemented("ApiAuthRepository.login");
+  login(request: LoginRequest): Promise<AuthSession> {
+    return apiPost<AuthSession>("/auth/login", request, { auth: false });
   }
 
-  register(_request: RegisterRequest): Promise<AuthSession> {
-    return notImplemented("ApiAuthRepository.register");
+  register(request: RegisterRequest): Promise<AuthSession> {
+    const { email, password, name, phone, document, birthDate, acceptTerms, acceptMarketing } =
+      request;
+    return apiPost<AuthSession>(
+      "/auth/register",
+      { email, password, name, phone, document, birthDate, acceptTerms, acceptMarketing },
+      { auth: false },
+    );
   }
 
-  logout(): Promise<void> {
-    return notImplemented("ApiAuthRepository.logout");
+  async logout(): Promise<void> {
+    await apiPost<void>("/auth/logout");
   }
 
-  refreshSession(_refreshToken: string): Promise<AuthSession> {
-    return notImplemented("ApiAuthRepository.refreshSession");
+  refreshSession(refreshToken: string): Promise<AuthSession> {
+    return apiPost<AuthSession>("/auth/refresh", { refreshToken }, { auth: false });
   }
 
-  getCurrentUser(): Promise<User | null> {
-    return notImplemented("ApiAuthRepository.getCurrentUser");
+  async getCurrentUser(): Promise<User | null> {
+    if (!useAuthStore.getState().session?.accessToken) return null;
+    try {
+      return await apiGet<User>("/auth/me");
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) return null;
+      throw err;
+    }
   }
 
   updateProfile(
-    _data: Partial<
-      Pick<User, "name" | "phone" | "document" | "avatarUrl" | "birthDate">
-    >,
+    data: Partial<Pick<User, "name" | "phone" | "document" | "avatarUrl" | "birthDate">>,
   ): Promise<User> {
-    return notImplemented("ApiAuthRepository.updateProfile");
+    return apiPatch<User>("/auth/me", data);
   }
 
-  forgotPassword(
-    _request: ForgotPasswordRequest,
-  ): Promise<{ message: string }> {
-    return notImplemented("ApiAuthRepository.forgotPassword");
+  forgotPassword(request: ForgotPasswordRequest): Promise<{ message: string }> {
+    return apiPost<{ message: string }>("/auth/forgot-password", request, { auth: false });
   }
 
-  resetPassword(
-    _token: string,
-    _newPassword: string,
-  ): Promise<{ message: string }> {
-    return notImplemented("ApiAuthRepository.resetPassword");
+  resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    return apiPost<{ message: string }>(
+      "/auth/reset-password",
+      { token, password: newPassword, passwordConfirmation: newPassword },
+      { auth: false },
+    );
   }
 
-  getSignupPromotion(): Promise<SignupPromotionResponse | null> {
-    return notImplemented("ApiAuthRepository.getSignupPromotion");
+  async getSignupPromotion(): Promise<SignupPromotionResponse | null> {
+    const response = await apiGet<RawSignupPromotion>("/auth/signup-promotion", undefined, {
+      auth: false,
+    });
+    return response.success ? response : null;
   }
 }

@@ -10,6 +10,7 @@ import type {
   CreatePromotionInput,
   CreateRewardTierInput,
   ProductListParams,
+  StoreIntegrationsSettings,
   StoreSettings,
   UpdateBrandInput,
   UpdateCategoryInput,
@@ -60,8 +61,19 @@ export function useAdminSettings() {
 export function useUpdateAdminSettings() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: Partial<StoreSettings>) =>
+    mutationFn: (input: Partial<Omit<StoreSettings, "integrations" | "updatedAt">>) =>
       adminService.updateSettings(input),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: adminKeys.settings() });
+    },
+  });
+}
+
+export function useUpdateAdminIntegrations() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: Partial<StoreIntegrationsSettings>) =>
+      adminService.updateIntegrations(input),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: adminKeys.settings() });
     },

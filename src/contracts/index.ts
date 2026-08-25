@@ -92,4 +92,5 @@ export type {
   CreateRewardTierInput,
   UpdateRewardTierInput,
   StoreSettings,
+  StoreIntegrationsSettings,
 } from "./admin.contract";

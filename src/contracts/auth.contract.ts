@@ -9,7 +9,8 @@ export interface User {
   document?: string;
   avatarUrl?: string;
   birthDate?: string;
-  role: "customer" | "admin";
+  /** Não retornado pelo backend real hoje; populado apenas pelos dados mock. */
+  role?: "customer" | "admin";
   emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
