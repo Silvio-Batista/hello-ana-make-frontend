@@ -1,6 +1,7 @@
 import type {
   AdminOrderListParams,
   CreateOrderRequest,
+  CreatePaymentResponse,
   Order,
   OrderStatus,
   UpdateOrderStatusRequest,
@@ -37,4 +38,6 @@ export interface OrderRepository {
   cancel(id: string, reason?: string): Promise<Order>;
   listAll(params?: AdminOrderListParams): Promise<OrderListResponse>;
   updateStatus(id: string, request: UpdateOrderStatusRequest): Promise<Order>;
+  /** POST /admin/orders/:id/refund — reembolso do pagamento do pedido (admin). */
+  refund(id: string, amount?: number): Promise<CreatePaymentResponse>;
 }

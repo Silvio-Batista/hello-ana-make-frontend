@@ -43,13 +43,15 @@ export function CheckoutOrderSummary({
           return (
             <li key={item.id} className="flex gap-3">
               <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-nude">
-                <Image
-                  src={item.image}
-                  alt={item.productName}
-                  fill
-                  className="object-cover"
-                  sizes="56px"
-                />
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt={item.productName}
+                    fill
+                    className="object-cover"
+                    sizes="56px"
+                  />
+                ) : null}
                 <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
                   {item.quantity}
                 </span>

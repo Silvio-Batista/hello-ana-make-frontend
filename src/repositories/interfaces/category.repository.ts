@@ -8,7 +8,8 @@ import type {
  * Repositório de categorias.
  */
 export interface CategoryRepository {
-  list(): Promise<Category[]>;
+  /** includeInactive=true traz categorias desativadas também (uso admin). */
+  list(includeInactive?: boolean): Promise<Category[]>;
   getById(id: string): Promise<Category | null>;
   getBySlug(slug: string): Promise<Category | null>;
   getChildren(parentId: string): Promise<Category[]>;

@@ -88,13 +88,15 @@ export function MiniCart() {
                     onClick={close}
                     className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-nude"
                   >
-                    <Image
-                      src={item.image}
-                      alt={item.productName}
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                    />
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.productName}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    ) : null}
                   </Link>
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <div className="flex items-start justify-between gap-2">

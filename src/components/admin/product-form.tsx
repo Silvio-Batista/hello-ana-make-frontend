@@ -16,6 +16,7 @@ import {
   Textarea,
   useToast,
 } from "@/components/ui";
+import { ImageUploadField } from "@/components/admin/image-upload-field";
 import {
   useAdminBrands,
   useAdminCategories,
@@ -443,13 +444,13 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         <div className="space-y-3">
           {form.images.map((image, index) => (
             <div key={image.id} className="flex flex-col gap-3 sm:flex-row">
-              <Input
-                label={index === 0 ? "URL" : undefined}
-                value={image.url}
-                onChange={(e) => updateImage(index, { url: e.target.value })}
-                placeholder="https://..."
-                className="flex-1"
-              />
+              <div className="flex-1">
+                <ImageUploadField
+                  label={index === 0 ? "URL" : undefined}
+                  value={image.url}
+                  onChange={(url) => updateImage(index, { url })}
+                />
+              </div>
               <Input
                 label={index === 0 ? "Texto alternativo" : undefined}
                 value={image.alt}

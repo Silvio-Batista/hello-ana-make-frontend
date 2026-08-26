@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { PriceDisplay } from "@/components/ui/price-display";
 import { QuantitySelector } from "@/components/ui/quantity-selector";
 import { StarRating } from "@/components/ui/star-rating";
+import { useToast } from "@/components/ui/toast";
+import { useAddCartItem } from "@/hooks/use-cart";
 import { useToggleFavorite } from "@/hooks/use-favorites";
 import { cn, formatCurrency } from "@/lib/utils";
-import { useCartStore, useUiStore } from "@/stores";
+import { useUiStore } from "@/stores";
 import { VariantSelector } from "./variant-selector";
 
 export interface ProductInfoProps {
@@ -19,9 +21,10 @@ export interface ProductInfoProps {
 }
 
 export function ProductInfo({ product, className }: ProductInfoProps) {
-  const addItem = useCartStore((s) => s.addItem);
+  const addItem = useAddCartItem();
   const setMiniCartOpen = useUiStore((s) => s.setMiniCartOpen);
   const toggleFavorite = useToggleFavorite();
+  const { toast } = useToast();
 
   const defaultVariant =
     product.variants.find((v) => v.isAvailable) ?? product.variants[0] ?? null;
@@ -50,32 +53,26 @@ export function ProductInfo({ product, className }: ProductInfoProps) {
     ? selected.isAvailable && selected.stock > 0
     : product.inventory.isInStock;
 
-  const primaryImage =
-    product.images.find((img) => img.isPrimary) ?? product.images[0];
-
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!selected) {
       setSelectionError(true);
       return;
     }
     setSelectionError(false);
 
-    addItem({
-      productId: product.id,
-      productSlug: product.slug,
-      productName: product.name,
-      variantId: selected.id,
-      variantSku: selected.sku,
-      variantName: selected.name,
-      attributes: selected.attributes,
-      image: selected.image ?? primaryImage?.url ?? "",
-      unitPrice: selected.price,
-      promotionalPrice: selected.promotionalPrice,
-      maxQuantity: selected.stock,
-      isAvailable: selected.isAvailable,
-      quantity,
-    });
-    setMiniCartOpen(true);
+    try {
+      await addItem.mutateAsync({
+        productId: product.id,
+        variantId: selected.id,
+        quantity,
+      });
+      setMiniCartOpen(true);
+    } catch (err) {
+      toast(
+        err instanceof Error ? err.message : "Não foi possível adicionar o produto.",
+        "error",
+      );
+    }
   };
 
   const handleShippingStub = (event: FormEvent) => {

@@ -2,6 +2,8 @@ import type {
   CreatePaymentRequest,
   CreatePaymentResponse,
   PaymentGateway,
+  TokenizeCardRequest,
+  TokenizeCardResponse,
 } from "@/contracts";
 
 export type { PaymentGateway };
@@ -14,4 +16,6 @@ export interface PaymentRepository {
   getPaymentStatus(paymentId: string): Promise<CreatePaymentResponse>;
   refundPayment?(paymentId: string, amount?: number): Promise<CreatePaymentResponse>;
   cancelPayment?(paymentId: string): Promise<CreatePaymentResponse>;
+  /** POST /payments/tokenize-card — gera o creditCardToken usado em createPayment. */
+  tokenizeCard(request: TokenizeCardRequest): Promise<TokenizeCardResponse>;
 }

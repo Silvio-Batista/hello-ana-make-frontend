@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { CreatePaymentResponse, Order } from "@/contracts";
+import type { CardPaymentData, CreatePaymentResponse, Order } from "@/contracts";
 import {
   AddressStep,
   CheckoutOrderSummary,
@@ -13,27 +13,30 @@ import {
   ShippingStep,
 } from "@/components/checkout";
 import { PageHeader } from "@/components/shared";
-import { Container } from "@/components/ui";
+import { Container, Spinner } from "@/components/ui";
 import {
   useAuth,
+  useCart,
   useCreateAddress,
   useCreateOrder,
 } from "@/hooks";
-import { useCartStore, useCheckoutStore } from "@/stores";
+import { useCheckoutStore } from "@/stores";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { isAuthenticated, hasHydrated } = useAuth();
 
-  const items = useCartStore((s) => s.items);
-  const couponCode = useCartStore((s) => s.couponCode);
-  const couponMessage = useCartStore((s) => s.couponMessage);
-  const shippingOption = useCartStore((s) => s.shippingOption);
-  const applyCoupon = useCartStore((s) => s.applyCoupon);
-  const removeCoupon = useCartStore((s) => s.removeCoupon);
-  const clearCart = useCartStore((s) => s.clearCart);
-  const getTotals = useCartStore((s) => s.getTotals);
-  const totals = getTotals();
+  const {
+    items,
+    couponCode,
+    couponMessage,
+    shippingOption,
+    totals,
+    isLoading: isCartLoading,
+    applyCoupon,
+    removeCoupon,
+    clearCart,
+  } = useCart();
 
   const step = useCheckoutStore((s) => s.step);
   const addressId = useCheckoutStore((s) => s.addressId);
@@ -53,12 +56,12 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (items.length === 0 && step < 5 && !confirmedOrder) {
+    if (!isCartLoading && items.length === 0 && step < 5 && !confirmedOrder) {
       router.replace("/carrinho");
     }
-  }, [items.length, step, confirmedOrder, router]);
+  }, [isCartLoading, items.length, step, confirmedOrder, router]);
 
-  const handleSubmitOrder = async () => {
+  const handleSubmitOrder = async (cardPayment?: CardPaymentData) => {
     setSubmitError(null);
 
     if (!paymentMethod || !shippingOptionId) {
@@ -100,10 +103,15 @@ export default function CheckoutPage() {
           couponCode: couponCode ?? undefined,
           notes: notes.trim() || undefined,
         },
-        payment: paymentMethod === "pix" || paymentMethod === "boleto" ? {} : undefined,
+        payment:
+          paymentMethod === "pix" || paymentMethod === "boleto"
+            ? {}
+            : paymentMethod === "credit_card" && cardPayment
+              ? { card: cardPayment }
+              : undefined,
       });
 
-      clearCart();
+      await clearCart();
       resetCheckout();
       setConfirmedOrder(result.order);
       setConfirmedPayment(result.payment ?? null);
@@ -129,6 +137,17 @@ export default function CheckoutPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (isCartLoading && step < 5) {
+    return (
+      <>
+        <PageHeader title="Checkout" description="Finalize sua compra em poucos passos" />
+        <Container className="flex justify-center py-16">
+          <Spinner label="Carregando checkout" />
+        </Container>
+      </>
+    );
+  }
 
   if (confirmedOrder && step === 5) {
     return (

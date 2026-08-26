@@ -72,13 +72,15 @@ export function OrderCard({ order, className }: OrderCardProps) {
             key={item.id}
             className="relative size-12 overflow-hidden rounded-lg bg-nude"
           >
-            <Image
-              src={item.image}
-              alt={item.productName}
-              fill
-              className="object-cover"
-              sizes="48px"
-            />
+            {item.image ? (
+              <Image
+                src={item.image}
+                alt={item.productName}
+                fill
+                className="object-cover"
+                sizes="48px"
+              />
+            ) : null}
           </div>
         ))}
         {order.items.length > 3 ? (

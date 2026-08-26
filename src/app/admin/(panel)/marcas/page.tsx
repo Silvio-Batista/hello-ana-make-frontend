@@ -5,6 +5,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import {
   ConfirmDialog,
   DataTable,
+  ImageUploadField,
   PageHeader,
   type DataTableColumn,
 } from "@/components/admin";
@@ -249,12 +250,10 @@ export default function AdminBrandsPage() {
               setForm((prev) => ({ ...prev, description: e.target.value }))
             }
           />
-          <Input
-            label="URL do logo"
+          <ImageUploadField
+            label="Logo"
             value={form.logo}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, logo: e.target.value }))
-            }
+            onChange={(logo) => setForm((prev) => ({ ...prev, logo }))}
           />
           <Input
             label="Website"

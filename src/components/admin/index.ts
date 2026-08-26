@@ -7,3 +7,4 @@ export { DataTable, type DataTableColumn } from "./data-table";
 export { PageHeader } from "./page-header";
 export { ConfirmDialog } from "./confirm-dialog";
 export { ProductForm } from "./product-form";
+export { ImageUploadField } from "./image-upload-field";

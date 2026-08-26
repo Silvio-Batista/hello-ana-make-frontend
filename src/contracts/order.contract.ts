@@ -1,6 +1,7 @@
 import type { Address } from "./address.contract";
 import type { ProductVariantAttributes } from "./product.contract";
 import type { PaymentMethod, PaymentStatus } from "./payment.contract";
+import type { CartRewardGift } from "./reward.contract";
 
 /**
  * Status do ciclo de vida do pedido.
@@ -60,6 +61,9 @@ export interface Order {
   trackingCode?: string;
   trackingUrl?: string;
   notes?: string;
+  rewardTierId?: string;
+  /** Snapshot do brinde conquistado na criação do pedido — não recalculado depois. */
+  rewardGift?: CartRewardGift;
   createdAt: string;
   updatedAt: string;
   paidAt?: string;

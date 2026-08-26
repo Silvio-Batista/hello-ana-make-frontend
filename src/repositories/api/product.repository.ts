@@ -37,11 +37,18 @@ export class ApiProductRepository implements ProductRepository {
   }
 
   async getById(id: string): Promise<Product | null> {
-    const { items } = await apiGet<ProductListResponse>("/admin/products", {
-      includeInactive: true,
-      pageSize: 100,
-    });
-    return items.find((p) => p.id === id) ?? null;
+    // Não existe GET /admin/products/:id no backend — pagina até achar (pageSize máx. 100).
+    let page = 1;
+    for (;;) {
+      const { items, totalPages } = await apiGet<ProductListResponse>(
+        "/admin/products",
+        { includeInactive: true, pageSize: 100, page },
+      );
+      const found = items.find((p) => p.id === id);
+      if (found) return found;
+      if (page >= totalPages) return null;
+      page += 1;
+    }
   }
 
   getBySlug(slug: string): Promise<Product | null> {

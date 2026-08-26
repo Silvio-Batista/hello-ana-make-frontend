@@ -18,7 +18,14 @@ export type {
   ProductListResponse,
 } from "./product.contract";
 
-export type { CartItem, Cart, CartTotals } from "./cart.contract";
+export type {
+  CartItem,
+  Cart,
+  CartTotals,
+  AddCartItemRequest,
+  UpdateCartItemRequest,
+  SelectShippingRequest,
+} from "./cart.contract";
 
 export type {
   CouponType,
@@ -27,7 +34,7 @@ export type {
   CouponValidationResult,
 } from "./coupon.contract";
 
-export type { RewardTier, RewardProgress } from "./reward.contract";
+export type { RewardTier, RewardProgress, CartRewardGift } from "./reward.contract";
 
 export type {
   ShippingQuoteItem,
@@ -47,6 +54,8 @@ export type {
   CreatePaymentRequest,
   CreatePaymentResponse,
   PaymentGateway,
+  TokenizeCardRequest,
+  TokenizeCardResponse,
 } from "./payment.contract";
 
 export type {
@@ -79,6 +88,10 @@ export type {
   AdminDashboardStats,
   AdminOrderListParams,
   UpdateOrderStatusRequest,
+  AdminCustomer,
+  AdminCustomerListParams,
+  AdminCustomerListResponse,
+  UploadImageResponse,
   CreateProductInput,
   UpdateProductInput,
   CreateCategoryInput,

@@ -36,13 +36,15 @@ export function CartItem({
         href={`/produtos/${item.productSlug}`}
         className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-nude sm:size-24"
       >
-        <Image
-          src={item.image}
-          alt={item.productName}
-          fill
-          className="object-cover"
-          sizes="96px"
-        />
+        {item.image ? (
+          <Image
+            src={item.image}
+            alt={item.productName}
+            fill
+            className="object-cover"
+            sizes="96px"
+          />
+        ) : null}
       </Link>
 
       <div className="flex min-w-0 flex-1 flex-col gap-2">

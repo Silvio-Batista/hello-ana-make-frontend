@@ -1,4 +1,5 @@
 export type { ProductRepository } from "./product.repository";
+export type { CartRepository } from "./cart.repository";
 export type { CategoryRepository } from "./category.repository";
 export type { CouponRepository } from "./coupon.repository";
 export type {

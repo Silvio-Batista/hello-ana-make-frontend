@@ -15,7 +15,7 @@ import {
   useToast,
   type BadgeVariant,
 } from "@/components/ui";
-import { useAdminOrder, useUpdateOrderStatus } from "@/hooks/use-admin";
+import { useAdminOrder, useRefundOrder, useUpdateOrderStatus } from "@/hooks/use-admin";
 import type { OrderStatus } from "@/contracts";
 import {
   ORDER_STATUS_LABELS,
@@ -49,11 +49,13 @@ export default function AdminOrderDetailPage() {
   const { toast } = useToast();
   const { data: order, isLoading } = useAdminOrder(id);
   const updateStatus = useUpdateOrderStatus();
+  const refundOrder = useRefundOrder();
 
   const [status, setStatus] = useState<OrderStatus>("pending_payment");
   const [trackingCode, setTrackingCode] = useState("");
   const [trackingUrl, setTrackingUrl] = useState("");
   const [notes, setNotes] = useState("");
+  const [refundAmount, setRefundAmount] = useState("");
 
   useEffect(() => {
     if (!order) return;
@@ -79,6 +81,23 @@ export default function AdminOrderDetailPage() {
     } catch (err) {
       toast(
         err instanceof Error ? err.message : "Erro ao atualizar pedido.",
+        "error",
+      );
+    }
+  };
+
+  const onRefund = async () => {
+    if (!order) return;
+    try {
+      await refundOrder.mutateAsync({
+        id: order.id,
+        amount: refundAmount ? Number(refundAmount) : undefined,
+      });
+      toast("Reembolso realizado com sucesso.", "success");
+      setRefundAmount("");
+    } catch (err) {
+      toast(
+        err instanceof Error ? err.message : "Erro ao reembolsar pedido.",
         "error",
       );
     }
@@ -213,6 +232,35 @@ export default function AdminOrderDetailPage() {
               </p>
             ) : null}
           </section>
+
+          {["paid", "partially_refunded"].includes(order.paymentStatus) ? (
+            <section className="rounded-xl border border-border bg-white p-5">
+              <h2 className="mb-4 text-sm font-semibold text-text-primary">
+                Reembolso
+              </h2>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <Input
+                  label="Valor (vazio = total)"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  max={order.total}
+                  value={refundAmount}
+                  onChange={(e) => setRefundAmount(e.target.value)}
+                  placeholder={String(order.total)}
+                  className="sm:max-w-xs"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  loading={refundOrder.isPending}
+                  onClick={onRefund}
+                >
+                  Reembolsar
+                </Button>
+              </div>
+            </section>
+          ) : null}
 
           <section className="rounded-xl border border-border bg-white p-5">
             <h2 className="mb-4 text-sm font-semibold text-text-primary">

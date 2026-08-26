@@ -7,9 +7,11 @@ import { Heart, Plus } from "lucide-react";
 import type { Product, ProductBadge as ProductBadgeType } from "@/contracts";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { PriceDisplay } from "@/components/ui/price-display";
+import { useToast } from "@/components/ui/toast";
+import { useAddCartItem } from "@/hooks/use-cart";
 import { useToggleFavorite } from "@/hooks/use-favorites";
 import { cn } from "@/lib/utils";
-import { useCartStore, useUiStore } from "@/stores";
+import { useUiStore } from "@/stores";
 
 function badgeVariant(type: ProductBadgeType["type"]): BadgeVariant {
   switch (type) {
@@ -36,9 +38,10 @@ export interface ProductCardProps {
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
-  const addItem = useCartStore((s) => s.addItem);
+  const addItem = useAddCartItem();
   const setMiniCartOpen = useUiStore((s) => s.setMiniCartOpen);
   const toggleFavorite = useToggleFavorite();
+  const { toast } = useToast();
 
   const primaryImage =
     product.images.find((img) => img.isPrimary) ?? product.images[0];
@@ -62,27 +65,24 @@ export function ProductCard({ product, className }: ProductCardProps) {
     });
   };
 
-  const handleQuickAdd = (event: MouseEvent) => {
+  const handleQuickAdd = async (event: MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     if (!singleVariant) return;
 
-    addItem({
-      productId: product.id,
-      productSlug: product.slug,
-      productName: product.name,
-      variantId: singleVariant.id,
-      variantSku: singleVariant.sku,
-      variantName: singleVariant.name,
-      attributes: singleVariant.attributes,
-      image: singleVariant.image ?? primaryImage?.url ?? "",
-      unitPrice: singleVariant.price,
-      promotionalPrice: singleVariant.promotionalPrice,
-      maxQuantity: singleVariant.stock,
-      isAvailable: singleVariant.isAvailable,
-      quantity: 1,
-    });
-    setMiniCartOpen(true);
+    try {
+      await addItem.mutateAsync({
+        productId: product.id,
+        variantId: singleVariant.id,
+        quantity: 1,
+      });
+      setMiniCartOpen(true);
+    } catch (err) {
+      toast(
+        err instanceof Error ? err.message : "Não foi possível adicionar o produto.",
+        "error",
+      );
+    }
   };
 
   return (

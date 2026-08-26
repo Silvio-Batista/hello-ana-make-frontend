@@ -2,6 +2,8 @@ import type {
   CreatePaymentRequest,
   CreatePaymentResponse,
   PaymentGateway,
+  TokenizeCardRequest,
+  TokenizeCardResponse,
 } from "@/contracts";
 import type { PaymentRepository } from "@/repositories/interfaces";
 import { apiGet, apiPost } from "@/lib/http-client";
@@ -22,6 +24,10 @@ export class ApiPaymentRepository implements PaymentRepository {
 
   cancelPayment(paymentId: string): Promise<CreatePaymentResponse> {
     return apiPost<CreatePaymentResponse>(`/payments/${paymentId}/cancel`);
+  }
+
+  tokenizeCard(request: TokenizeCardRequest): Promise<TokenizeCardResponse> {
+    return apiPost<TokenizeCardResponse>("/payments/tokenize-card", request);
   }
 }
 
@@ -47,6 +53,10 @@ export class AsaasPaymentGateway implements PaymentGateway, PaymentRepository {
 
   cancelPayment(_paymentId: string): Promise<CreatePaymentResponse> {
     return notImplemented("AsaasPaymentGateway.cancelPayment");
+  }
+
+  tokenizeCard(_request: TokenizeCardRequest): Promise<TokenizeCardResponse> {
+    return notImplemented("AsaasPaymentGateway.tokenizeCard");
   }
 }
 
@@ -75,6 +85,10 @@ export class MercadoPagoPaymentGateway
   cancelPayment(_paymentId: string): Promise<CreatePaymentResponse> {
     return notImplemented("MercadoPagoPaymentGateway.cancelPayment");
   }
+
+  tokenizeCard(_request: TokenizeCardRequest): Promise<TokenizeCardResponse> {
+    return notImplemented("MercadoPagoPaymentGateway.tokenizeCard");
+  }
 }
 
 export class StripePaymentGateway implements PaymentGateway, PaymentRepository {
@@ -99,5 +113,9 @@ export class StripePaymentGateway implements PaymentGateway, PaymentRepository {
 
   cancelPayment(_paymentId: string): Promise<CreatePaymentResponse> {
     return notImplemented("StripePaymentGateway.cancelPayment");
+  }
+
+  tokenizeCard(_request: TokenizeCardRequest): Promise<TokenizeCardResponse> {
+    return notImplemented("StripePaymentGateway.tokenizeCard");
   }
 }

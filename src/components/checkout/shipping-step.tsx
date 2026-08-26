@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Button, Spinner } from "@/components/ui";
-import { useAddresses, useShippingQuote } from "@/hooks";
+import { useAddresses, useCart, useShippingQuote } from "@/hooks";
 import { formatCurrency, cn } from "@/lib/utils";
-import { useCartStore, useCheckoutStore } from "@/stores";
+import { useCheckoutStore } from "@/stores";
 
 export function ShippingStep() {
-  const items = useCartStore((s) => s.items);
-  const subtotal = useCartStore((s) => s.getSubtotal());
-  const setShipping = useCartStore((s) => s.setShipping);
+  const { items, subtotal, setShipping } = useCart();
 
   const addressId = useCheckoutStore((s) => s.addressId);
   const newAddress = useCheckoutStore((s) => s.newAddress);
@@ -23,6 +21,11 @@ export function ShippingStep() {
 
   const zipCode = newAddress?.zipCode ?? selectedAddress?.zipCode ?? "";
 
+  // Chave por conteúdo (não a referência de `items`, que muda a cada resposta do
+  // servidor mesmo sem mudança real) — evita recotar frete a cada `setShipping`,
+  // que já escreve no carrinho e faria `items` mudar de novo, num loop.
+  const itemsKey = items.map((item) => `${item.variantId}:${item.quantity}`).join(",");
+
   const quoteRequest = useMemo(() => {
     const digits = zipCode.replace(/\D/g, "");
     if (digits.length < 8 || items.length === 0) return null;
@@ -35,35 +38,37 @@ export function ShippingStep() {
         quantity: item.quantity,
       })),
     };
-  }, [zipCode, items, subtotal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zipCode, itemsKey, subtotal]);
 
   const quote = useShippingQuote(quoteRequest);
+
+  // Ref pro `setShipping` mais recente — o efeito de sincronização só deve reagir
+  // à cotação/seleção mudando, nunca à identidade da função em si.
+  const setShippingRef = useRef(setShipping);
+  useEffect(() => {
+    setShippingRef.current = setShipping;
+  }, [setShipping]);
 
   useEffect(() => {
     const options = quote.data?.options;
     if (!options?.length) return;
     if (shippingOptionId && options.some((o) => o.id === shippingOptionId)) {
       const current = options.find((o) => o.id === shippingOptionId);
-      if (current) setShipping(current, zipCode);
+      if (current) void setShippingRef.current(current, zipCode);
       return;
     }
     const preferred = options.find((o) => o.isFree) ?? options[0];
     if (preferred) {
       setShippingOptionId(preferred.id);
-      setShipping(preferred, zipCode);
+      void setShippingRef.current(preferred, zipCode);
     }
-  }, [
-    quote.data,
-    shippingOptionId,
-    setShippingOptionId,
-    setShipping,
-    zipCode,
-  ]);
+  }, [quote.data, shippingOptionId, setShippingOptionId, zipCode]);
 
-  const continueNext = () => {
+  const continueNext = async () => {
     if (!shippingOptionId) return;
     const option = quote.data?.options.find((o) => o.id === shippingOptionId);
-    if (option) setShipping(option, zipCode);
+    if (option) await setShipping(option, zipCode);
     nextStep();
   };
 
@@ -92,7 +97,7 @@ export function ShippingStep() {
                 type="button"
                 onClick={() => {
                   setShippingOptionId(option.id);
-                  setShipping(option, zipCode);
+                  void setShipping(option, zipCode);
                 }}
                 className={cn(
                   "flex w-full items-center justify-between gap-3 rounded-xl border p-4 text-left transition-colors",

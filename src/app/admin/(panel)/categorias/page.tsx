@@ -5,6 +5,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import {
   ConfirmDialog,
   DataTable,
+  ImageUploadField,
   PageHeader,
   type DataTableColumn,
 } from "@/components/admin";
@@ -255,12 +256,10 @@ export default function AdminCategoriesPage() {
             }
             required
           />
-          <Input
-            label="URL da imagem"
+          <ImageUploadField
+            label="Imagem"
             value={form.image}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, image: e.target.value }))
-            }
+            onChange={(image) => setForm((prev) => ({ ...prev, image }))}
             required
           />
           <Select

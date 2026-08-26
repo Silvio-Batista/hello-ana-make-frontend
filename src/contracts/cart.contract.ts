@@ -42,5 +42,28 @@ export interface Cart {
   items: CartItem[];
   totals: CartTotals;
   couponCode?: string;
+  couponMessage?: string;
+  freeShipping: boolean;
+  shippingOptionId?: string;
+  /** subtotal - desconto de cupom (sem frete) — usar em GET /rewards/progress. */
+  rewardEligibleAmount: number;
   updatedAt: string;
+}
+
+/** POST /cart/items */
+export interface AddCartItemRequest {
+  productId: string;
+  variantId: string;
+  quantity: number;
+}
+
+/** PATCH /cart/items/:itemId */
+export interface UpdateCartItemRequest {
+  quantity: number;
+}
+
+/** PUT /cart/shipping */
+export interface SelectShippingRequest {
+  shippingOptionId: string;
+  zipCode: string;
 }

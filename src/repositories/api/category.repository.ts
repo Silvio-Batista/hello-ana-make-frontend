@@ -7,10 +7,10 @@ import type { CategoryRepository } from "@/repositories/interfaces";
 import { apiDelete, apiGet, apiPost, apiPut, getOrNull } from "@/lib/http-client";
 
 export class ApiCategoryRepository implements CategoryRepository {
-  async list(): Promise<Category[]> {
+  async list(includeInactive = false): Promise<Category[]> {
     const { items } = await apiGet<{ items: Category[] }>(
       "/categories",
-      { tree: false },
+      { tree: false, includeInactive },
       { auth: false },
     );
     return items;

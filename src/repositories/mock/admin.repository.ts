@@ -1,8 +1,12 @@
 import type {
+  AdminCustomer,
+  AdminCustomerListParams,
+  AdminCustomerListResponse,
   AdminDashboardStats,
   OrderStatus,
   StoreIntegrationsSettings,
   StoreSettings,
+  UploadImageResponse,
 } from "@/contracts";
 import type { AdminRepository } from "@/repositories/interfaces";
 import { defaultStoreSettings, products, users } from "@/mocks";
@@ -154,5 +158,56 @@ export class MockAdminRepository implements AdminRepository {
       superfreteToken: maskSecret(integrations.superfreteToken),
       updatedAt,
     };
+  }
+
+  async listCustomers(
+    params: AdminCustomerListParams = {},
+  ): Promise<AdminCustomerListResponse> {
+    await delay();
+    const page = params.page ?? 1;
+    const pageSize = params.pageSize ?? 20;
+    const orderStore = getMockOrderStore();
+
+    let customers = users.filter((u) => (u.role ?? "customer") === "customer");
+    if (params.search) {
+      const q = params.search.toLowerCase().trim();
+      customers = customers.filter(
+        (u) => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
+      );
+    }
+
+    const total = customers.length;
+    const start = (page - 1) * pageSize;
+    const items: AdminCustomer[] = customers.slice(start, start + pageSize).map((u) => ({
+      ...u,
+      ordersCount: orderStore.filter((o) => o.userId === u.id).length,
+    }));
+
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages: total === 0 ? 0 : Math.ceil(total / pageSize),
+    };
+  }
+
+  async getCustomerById(id: string): Promise<AdminCustomer | null> {
+    await delay();
+    const user = users.find((u) => u.id === id && (u.role ?? "customer") === "customer");
+    if (!user) return null;
+    const ordersCount = getMockOrderStore().filter((o) => o.userId === user.id).length;
+    return { ...user, ordersCount };
+  }
+
+  async uploadImage(file: File): Promise<UploadImageResponse> {
+    await delay();
+    const url = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+    return { url, mimeType: file.type, size: file.size };
   }
 }

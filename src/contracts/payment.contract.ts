@@ -76,6 +76,29 @@ export interface CreatePaymentResponse {
 }
 
 /**
+ * Dados de cartão + endereço de cobrança para tokenização (POST /payments/tokenize-card).
+ * O Asaas não expõe SDK client-side/chave pública — a tokenização acontece no backend,
+ * autenticada com a access_token secreta (nunca exposta ao navegador). Nome/e-mail/CPF/
+ * telefone do titular vêm do perfil do usuário autenticado, não precisam ser reenviados.
+ */
+export interface TokenizeCardRequest {
+  holderName: string;
+  number: string;
+  expiryMonth: string;
+  expiryYear: string;
+  ccv: string;
+  postalCode: string;
+  addressNumber: string;
+  addressComplement?: string;
+}
+
+export interface TokenizeCardResponse {
+  token: string;
+  brand?: string;
+  lastFourDigits?: string;
+}
+
+/**
  * Contrato do gateway de pagamento.
  */
 export interface PaymentGateway {

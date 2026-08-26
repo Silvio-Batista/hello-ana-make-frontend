@@ -25,8 +25,19 @@ export class ApiCouponRepository implements CouponRepository {
   }
 
   async list(): Promise<Coupon[]> {
-    const { items } = await apiGet<{ items: Coupon[] }>("/admin/coupons");
-    return items;
+    // GET /admin/coupons é paginado (default pageSize 20) mas essa lista precisa vir completa.
+    const all: Coupon[] = [];
+    let page = 1;
+    for (;;) {
+      const { items, totalPages } = await apiGet<{
+        items: Coupon[];
+        totalPages: number;
+      }>("/admin/coupons", { page, pageSize: 100 });
+      all.push(...items);
+      if (page >= totalPages) break;
+      page += 1;
+    }
+    return all;
   }
 
   async getById(id: string): Promise<Coupon | null> {

@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
+  AdminCustomerListParams,
   AdminOrderListParams,
   CreateBrandInput,
   CreateCategoryInput,
@@ -42,6 +43,9 @@ export const adminKeys = {
   orders: (params?: AdminOrderListParams) =>
     [...adminKeys.all, "orders", params] as const,
   order: (id: string) => [...adminKeys.all, "order", id] as const,
+  customers: (params?: AdminCustomerListParams) =>
+    [...adminKeys.all, "customers", params] as const,
+  customer: (id: string) => [...adminKeys.all, "customer", id] as const,
 };
 
 export function useAdminStats() {
@@ -354,5 +358,38 @@ export function useUpdateOrderStatus() {
       void qc.invalidateQueries({ queryKey: adminKeys.order(vars.id) });
       void qc.invalidateQueries({ queryKey: adminKeys.stats() });
     },
+  });
+}
+
+export function useRefundOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, amount }: { id: string; amount?: number }) =>
+      adminService.refundOrder(id, amount),
+    onSuccess: (_data, vars) => {
+      void qc.invalidateQueries({ queryKey: adminKeys.order(vars.id) });
+      void qc.invalidateQueries({ queryKey: adminKeys.orders() });
+    },
+  });
+}
+
+export function useAdminCustomers(params?: AdminCustomerListParams) {
+  return useQuery({
+    queryKey: adminKeys.customers(params),
+    queryFn: () => adminService.listCustomers(params),
+  });
+}
+
+export function useAdminCustomer(id: string) {
+  return useQuery({
+    queryKey: adminKeys.customer(id),
+    queryFn: () => adminService.getCustomer(id),
+    enabled: Boolean(id),
+  });
+}
+
+export function useUploadImage() {
+  return useMutation({
+    mutationFn: (file: File) => adminService.uploadImage(file),
   });
 }

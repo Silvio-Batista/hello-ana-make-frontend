@@ -1,6 +1,8 @@
 import type {
   CreatePaymentRequest,
   CreatePaymentResponse,
+  TokenizeCardRequest,
+  TokenizeCardResponse,
 } from "@/contracts";
 import type { PaymentRepository } from "@/repositories/interfaces";
 import { delay } from "@/repositories/utils";
@@ -86,5 +88,17 @@ export class MockPaymentRepository implements PaymentRepository {
     };
     payments.set(paymentId, updated);
     return updated;
+  }
+
+  /** Cartão terminado em "0002" simula recusa (mesma convenção do gateway mock do backend). */
+  async tokenizeCard(request: TokenizeCardRequest): Promise<TokenizeCardResponse> {
+    await delay();
+    const digits = request.number.replace(/\D/g, "");
+    const declines = digits.endsWith("0002");
+    return {
+      token: `tok_mock_${declines ? "fail_" : ""}${Date.now()}`,
+      brand: "MASTERCARD",
+      lastFourDigits: digits.slice(-4),
+    };
   }
 }

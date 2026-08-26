@@ -55,4 +55,8 @@ export class ApiOrderRepository implements OrderRepository {
   updateStatus(id: string, request: UpdateOrderStatusRequest): Promise<Order> {
     return apiPatch<Order>(`/admin/orders/${id}/status`, request);
   }
+
+  refund(id: string, amount?: number): Promise<CreatePaymentResponse> {
+    return apiPost<CreatePaymentResponse>(`/admin/orders/${id}/refund`, { amount });
+  }
 }

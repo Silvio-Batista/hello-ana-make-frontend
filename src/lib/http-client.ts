@@ -92,7 +92,24 @@ interface RequestOptions {
   headers?: Record<string, string>;
 }
 
-function performFetch(path: string, options: RequestOptions): Promise<Response> {
+/**
+ * Numa carga fria, a sessão persistida (zustand/persist) ainda não terminou de
+ * reidratar do localStorage no primeiro tick — disparar antes disso manda a
+ * requisição sem Authorization (silenciosamente anônima em rotas com auth
+ * opcional, como /cart). Espera reidratar antes de montar os headers.
+ */
+function waitForAuthHydration(): Promise<void> {
+  if (useAuthStore.persist.hasHydrated()) return Promise.resolve();
+  return new Promise((resolve) => {
+    const unsubscribe = useAuthStore.persist.onFinishHydration(() => {
+      unsubscribe();
+      resolve();
+    });
+  });
+}
+
+async function performFetch(path: string, options: RequestOptions): Promise<Response> {
+  await waitForAuthHydration();
   const headers: Record<string, string> = { Accept: "application/json", ...options.headers };
   const accessToken = useAuthStore.getState().session?.accessToken;
   if (options.auth !== false && accessToken) {
@@ -142,7 +159,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 export function apiGet<T>(
   path: string,
   query?: QueryParams,
-  options?: Pick<RequestOptions, "auth">,
+  options?: Pick<RequestOptions, "auth" | "headers">,
 ): Promise<T> {
   return request<T>(path, { method: "GET", query, ...options });
 }
@@ -150,7 +167,7 @@ export function apiGet<T>(
 export function apiPost<T>(
   path: string,
   body?: unknown,
-  options?: Pick<RequestOptions, "auth" | "query">,
+  options?: Pick<RequestOptions, "auth" | "query" | "headers">,
 ): Promise<T> {
   return request<T>(path, { method: "POST", body, ...options });
 }
@@ -158,7 +175,7 @@ export function apiPost<T>(
 export function apiPut<T>(
   path: string,
   body?: unknown,
-  options?: Pick<RequestOptions, "auth">,
+  options?: Pick<RequestOptions, "auth" | "headers">,
 ): Promise<T> {
   return request<T>(path, { method: "PUT", body, ...options });
 }
@@ -166,14 +183,14 @@ export function apiPut<T>(
 export function apiPatch<T>(
   path: string,
   body?: unknown,
-  options?: Pick<RequestOptions, "auth">,
+  options?: Pick<RequestOptions, "auth" | "headers">,
 ): Promise<T> {
   return request<T>(path, { method: "PATCH", body, ...options });
 }
 
 export function apiDelete<T = void>(
   path: string,
-  options?: Pick<RequestOptions, "auth">,
+  options?: Pick<RequestOptions, "auth" | "headers">,
 ): Promise<T> {
   return request<T>(path, { method: "DELETE", ...options });
 }

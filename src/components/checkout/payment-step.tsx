@@ -2,8 +2,10 @@
 
 import { useState, type FormEvent } from "react";
 import { CreditCard, FileText, QrCode } from "lucide-react";
-import type { PaymentMethod } from "@/contracts";
+import type { CardPaymentData, PaymentMethod } from "@/contracts";
 import { Button, Input, Select, Textarea } from "@/components/ui";
+import { useAddresses } from "@/hooks/use-addresses";
+import { useTokenizeCard } from "@/hooks/use-payments";
 import { cn } from "@/lib/utils";
 import { useCheckoutStore } from "@/stores";
 
@@ -34,7 +36,7 @@ const METHODS: {
 ];
 
 export interface PaymentStepProps {
-  onSubmitOrder: () => Promise<void>;
+  onSubmitOrder: (cardPayment?: CardPaymentData) => Promise<void>;
   isSubmitting: boolean;
   submitError: string | null;
 }
@@ -49,6 +51,14 @@ export function PaymentStep({
   const setPaymentMethod = useCheckoutStore((s) => s.setPaymentMethod);
   const setNotes = useCheckoutStore((s) => s.setNotes);
   const prevStep = useCheckoutStore((s) => s.prevStep);
+  const addressId = useCheckoutStore((s) => s.addressId);
+  const newAddress = useCheckoutStore((s) => s.newAddress);
+
+  const addressesQuery = useAddresses(Boolean(addressId));
+  const selectedAddress = addressesQuery.data?.find((a) => a.id === addressId);
+  const billingAddress = newAddress ?? selectedAddress;
+
+  const tokenizeCard = useTokenizeCard();
 
   const [cardName, setCardName] = useState("");
   const [cardNumber, setCardNumber] = useState("");
@@ -66,19 +76,52 @@ export function PaymentStep({
       return;
     }
 
-    if (paymentMethod === "credit_card") {
-      if (
-        !cardName.trim() ||
-        cardNumber.replace(/\D/g, "").length < 13 ||
-        !cardExpiry.trim() ||
-        cardCvv.length < 3
-      ) {
-        setLocalError("Preencha os dados do cartão.");
-        return;
-      }
+    if (paymentMethod !== "credit_card") {
+      await onSubmitOrder();
+      return;
     }
 
-    await onSubmitOrder();
+    const [expiryMonth, expiryYearShort] = cardExpiry.split("/");
+    if (
+      !cardName.trim() ||
+      cardNumber.replace(/\D/g, "").length < 13 ||
+      !expiryMonth ||
+      expiryYearShort?.length !== 2 ||
+      cardCvv.length < 3
+    ) {
+      setLocalError("Preencha os dados do cartão.");
+      return;
+    }
+
+    if (!billingAddress?.zipCode || !billingAddress.number) {
+      setLocalError("Selecione um endereço de entrega com CEP e número antes de pagar com cartão.");
+      return;
+    }
+
+    try {
+      const tokenized = await tokenizeCard.mutateAsync({
+        holderName: cardName.trim(),
+        number: cardNumber.replace(/\D/g, ""),
+        expiryMonth,
+        expiryYear: `20${expiryYearShort}`,
+        ccv: cardCvv,
+        postalCode: billingAddress.zipCode.replace(/\D/g, ""),
+        addressNumber: billingAddress.number,
+        addressComplement: billingAddress.complement || undefined,
+      });
+
+      await onSubmitOrder({
+        token: tokenized.token,
+        installments: Number(installments),
+        holderName: cardName.trim(),
+        brand: tokenized.brand,
+        lastFourDigits: tokenized.lastFourDigits,
+      });
+    } catch (err) {
+      setLocalError(
+        err instanceof Error ? err.message : "Não foi possível processar o cartão.",
+      );
+    }
   };
 
   return (
@@ -191,8 +234,8 @@ export function PaymentStep({
               />
             </div>
             <p className="sm:col-span-2 text-xs text-text-secondary">
-              Em ambiente de demonstração os dados do cartão não são enviados a
-              um gateway real.
+              O número do cartão nunca é salvo — só usamos ele pra gerar um
+              token seguro junto ao gateway de pagamento.
             </p>
           </div>
         ) : null}
@@ -228,7 +271,7 @@ export function PaymentStep({
           <Button type="button" variant="outline" onClick={prevStep}>
             Voltar
           </Button>
-          <Button type="submit" loading={isSubmitting}>
+          <Button type="submit" loading={isSubmitting || tokenizeCard.isPending}>
             Finalizar pedido
           </Button>
         </div>

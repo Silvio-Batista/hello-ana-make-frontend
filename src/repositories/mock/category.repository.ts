@@ -11,10 +11,10 @@ let categoryStore = categories;
 let categorySeq = categories.length + 1;
 
 export class MockCategoryRepository implements CategoryRepository {
-  async list(): Promise<Category[]> {
+  async list(includeInactive = false): Promise<Category[]> {
     await delay();
     return [...categoryStore]
-      .filter((c) => c.isActive)
+      .filter((c) => includeInactive || c.isActive)
       .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   }
 

@@ -10,9 +10,11 @@ import { apiPost } from "@/lib/http-client";
 import { notImplemented } from "@/repositories/utils";
 
 function quote(request: ShippingQuoteRequest): Promise<ShippingQuoteResponse> {
+  // Apesar do AGENTS.md descrever o body como só {zipCode, subtotal}, o backend
+  // real exige `items` (ShippingQuoteDto, @ArrayMinSize(1)) — sem isso, 422 sempre.
   return apiPost<ShippingQuoteResponse>(
     "/shipping/quote",
-    { zipCode: request.zipCode, subtotal: request.subtotal },
+    { zipCode: request.zipCode, subtotal: request.subtotal, items: request.items },
     { auth: false },
   );
 }

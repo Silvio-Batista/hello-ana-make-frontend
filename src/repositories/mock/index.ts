@@ -1,4 +1,5 @@
 export { MockProductRepository } from "./product.repository";
+export { MockCartRepository } from "./cart.repository";
 export { MockCategoryRepository } from "./category.repository";
 export { MockCouponRepository } from "./coupon.repository";
 export { MockOrderRepository } from "./order.repository";

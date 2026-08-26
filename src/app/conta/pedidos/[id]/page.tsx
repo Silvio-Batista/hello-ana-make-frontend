@@ -101,13 +101,15 @@ export default function PedidoDetalhePage({
               {order.items.map((item) => (
                 <li key={item.id} className="flex gap-3">
                   <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-nude">
-                    <Image
-                      src={item.image}
-                      alt={item.productName}
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                    />
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.productName}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    ) : null}
                   </div>
                   <div className="min-w-0 flex-1">
                     <Link

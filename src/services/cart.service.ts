@@ -1,50 +1,41 @@
-import type { CartItem, CartTotals } from "@/contracts";
+import type {
+  AddCartItemRequest,
+  Cart,
+  CouponValidationResult,
+  SelectShippingRequest,
+} from "@/contracts";
+import { cartRepository } from "@/lib/container";
 
-/** Preço unitário efetivo (promoção ou preço cheio). */
-export function getUnitLinePrice(item: Pick<CartItem, "unitPrice" | "promotionalPrice">): number {
-  return item.promotionalPrice ?? item.unitPrice;
-}
+export const cartService = {
+  getCart(): Promise<Cart> {
+    return cartRepository.getCart();
+  },
 
-/** Calcula o total da linha (preço efetivo × quantidade). */
-export function calculateLineTotal(
-  item: Pick<CartItem, "unitPrice" | "promotionalPrice" | "quantity">,
-): number {
-  return Math.round(getUnitLinePrice(item) * item.quantity * 100) / 100;
-}
+  addItem(input: AddCartItemRequest): Promise<Cart> {
+    return cartRepository.addItem(input);
+  },
 
-/** Soma dos totais de linha do carrinho. */
-export function calculateSubtotal(items: CartItem[]): number {
-  return Math.round(items.reduce((sum, item) => sum + calculateLineTotal(item), 0) * 100) / 100;
-}
+  updateItemQuantity(itemId: string, quantity: number): Promise<Cart> {
+    return cartRepository.updateItemQuantity(itemId, { quantity });
+  },
 
-/**
- * Recalcula totais do carrinho considerando cupom e frete.
- * Frete grátis zera o valor de shipping.
- */
-export function recalculateTotals(
-  items: CartItem[],
-  couponDiscount: number,
-  shippingPrice: number,
-  freeShipping: boolean,
-): CartTotals {
-  const subtotal = calculateSubtotal(items);
-  const discount = Math.min(Math.max(0, couponDiscount), subtotal);
-  const shipping = freeShipping ? 0 : Math.max(0, shippingPrice);
-  const tax = 0;
-  const total = Math.round(Math.max(0, subtotal - discount + shipping + tax) * 100) / 100;
+  removeItem(itemId: string): Promise<Cart> {
+    return cartRepository.removeItem(itemId);
+  },
 
-  return {
-    subtotal,
-    discount: Math.round(discount * 100) / 100,
-    shipping: Math.round(shipping * 100) / 100,
-    tax,
-    total,
-    itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
-    currency: "BRL",
-  };
-}
+  clear(): Promise<Cart> {
+    return cartRepository.clear();
+  },
 
-/** Valor elegível para brindes = subtotal − desconto de cupom (sem frete). */
-export function getEligibleAmount(subtotal: number, couponDiscount: number): number {
-  return Math.max(0, Math.round((subtotal - Math.max(0, couponDiscount)) * 100) / 100);
-}
+  applyCoupon(code: string): Promise<{ cart: Cart; validation: CouponValidationResult }> {
+    return cartRepository.applyCoupon(code);
+  },
+
+  removeCoupon(): Promise<Cart> {
+    return cartRepository.removeCoupon();
+  },
+
+  selectShipping(input: SelectShippingRequest): Promise<Cart> {
+    return cartRepository.selectShipping(input);
+  },
+};

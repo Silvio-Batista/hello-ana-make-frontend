@@ -1,4 +1,5 @@
 export { ApiProductRepository } from "./product.repository";
+export { ApiCartRepository } from "./cart.repository";
 export { ApiCategoryRepository } from "./category.repository";
 export { ApiCouponRepository } from "./coupon.repository";
 export { ApiOrderRepository } from "./order.repository";

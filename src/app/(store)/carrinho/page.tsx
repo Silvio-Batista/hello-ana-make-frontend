@@ -19,6 +19,7 @@ export default function CarrinhoPage() {
     couponMessage,
     totals,
     rewardProgress,
+    isLoading,
     updateQuantity,
     removeItem,
     applyCoupon,
@@ -29,7 +30,7 @@ export default function CarrinhoPage() {
 
   const bestsellers = useBestsellers(4);
 
-  const isEmpty = items.length === 0;
+  const isEmpty = !isLoading && items.length === 0;
 
   return (
     <>
@@ -43,7 +44,11 @@ export default function CarrinhoPage() {
       />
 
       <Container className="py-8 md:py-10">
-        {isEmpty ? (
+        {isLoading ? (
+          <div className="flex justify-center py-16">
+            <Spinner label="Carregando carrinho" />
+          </div>
+        ) : isEmpty ? (
           <CartEmpty />
         ) : (
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
@@ -90,13 +95,15 @@ export default function CarrinhoPage() {
                           href={`/produtos/${item.productSlug}`}
                           className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-nude"
                         >
-                          <Image
-                            src={item.image}
-                            alt={item.productName}
-                            fill
-                            className="object-cover"
-                            sizes="64px"
-                          />
+                          {item.image ? (
+                            <Image
+                              src={item.image}
+                              alt={item.productName}
+                              fill
+                              className="object-cover"
+                              sizes="64px"
+                            />
+                          ) : null}
                         </Link>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium text-text-primary">

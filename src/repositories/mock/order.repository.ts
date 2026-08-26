@@ -1,6 +1,7 @@
 import type {
   AdminOrderListParams,
   CreateOrderRequest,
+  CreatePaymentResponse,
   Order,
   OrderItem,
   UpdateOrderStatusRequest,
@@ -263,5 +264,32 @@ export class MockOrderRepository implements OrderRepository {
     };
     orderStore[index] = updated;
     return updated;
+  }
+
+  async refund(id: string, amount?: number): Promise<CreatePaymentResponse> {
+    await delay();
+    const index = orderStore.findIndex((o) => o.id === id);
+    if (index < 0) throw new Error("Pedido não encontrado.");
+    const order = orderStore[index]!;
+    if (!["paid", "partially_refunded"].includes(order.paymentStatus)) {
+      throw new Error("Pagamento não pode ser reembolsado.");
+    }
+    const refundedAmount = amount ?? order.total;
+    const now = new Date().toISOString();
+    orderStore[index] = {
+      ...order,
+      paymentStatus: refundedAmount >= order.total ? "refunded" : "partially_refunded",
+      status: refundedAmount >= order.total ? "refunded" : order.status,
+      updatedAt: now,
+    };
+    return {
+      id: order.paymentId ?? `pay-${order.id}`,
+      orderId: order.id,
+      method: order.paymentMethod,
+      status: refundedAmount >= order.total ? "refunded" : "partially_refunded",
+      amount: order.total,
+      currency: order.currency,
+      createdAt: now,
+    };
   }
 }

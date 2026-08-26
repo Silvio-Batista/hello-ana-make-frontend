@@ -1,10 +1,14 @@
 import type {
+  AdminCustomer,
+  AdminCustomerListParams,
+  AdminCustomerListResponse,
   AdminDashboardStats,
   StoreIntegrationsSettings,
   StoreSettings,
+  UploadImageResponse,
 } from "@/contracts";
 import type { AdminRepository } from "@/repositories/interfaces";
-import { apiGet, apiPatch, apiPut } from "@/lib/http-client";
+import { apiGet, apiPatch, apiPost, apiPut, getOrNull } from "@/lib/http-client";
 
 export class ApiAdminRepository implements AdminRepository {
   getDashboardStats(): Promise<AdminDashboardStats> {
@@ -28,5 +32,25 @@ export class ApiAdminRepository implements AdminRepository {
       "/admin/settings/integrations",
       input,
     );
+  }
+
+  listCustomers(
+    params: AdminCustomerListParams = {},
+  ): Promise<AdminCustomerListResponse> {
+    return apiGet<AdminCustomerListResponse>("/admin/customers", {
+      page: params.page,
+      pageSize: params.pageSize,
+      search: params.search,
+    });
+  }
+
+  getCustomerById(id: string): Promise<AdminCustomer | null> {
+    return getOrNull<AdminCustomer>(`/admin/customers/${id}`);
+  }
+
+  uploadImage(file: File): Promise<UploadImageResponse> {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiPost<UploadImageResponse>("/admin/uploads", formData);
   }
 }

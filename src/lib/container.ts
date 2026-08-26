@@ -3,6 +3,7 @@ import type {
   AdminRepository,
   AuthRepository,
   BrandRepository,
+  CartRepository,
   CategoryRepository,
   CouponRepository,
   FavoriteRepository,
@@ -18,6 +19,7 @@ import {
   ApiAdminRepository,
   ApiAuthRepository,
   ApiBrandRepository,
+  ApiCartRepository,
   ApiCategoryRepository,
   ApiCouponRepository,
   ApiFavoriteRepository,
@@ -36,6 +38,7 @@ import {
   MockAdminRepository,
   MockAuthRepository,
   MockBrandRepository,
+  MockCartRepository,
   MockCategoryRepository,
   MockCouponRepository,
   MockFavoriteRepository,
@@ -52,6 +55,10 @@ const useApi = process.env.NEXT_PUBLIC_DATA_SOURCE === "api";
 export const productRepository: ProductRepository = useApi
   ? new ApiProductRepository()
   : new MockProductRepository();
+
+export const cartRepository: CartRepository = useApi
+  ? new ApiCartRepository()
+  : new MockCartRepository();
 
 export const categoryRepository: CategoryRepository = useApi
   ? new ApiCategoryRepository()
@@ -110,6 +117,7 @@ export const paymentGateways = {
 
 export const container = {
   productRepository,
+  cartRepository,
   categoryRepository,
   couponRepository,
   orderRepository,

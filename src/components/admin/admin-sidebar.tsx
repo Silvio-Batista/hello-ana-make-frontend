@@ -15,6 +15,7 @@ import {
   ShoppingBag,
   Tags,
   Ticket,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,6 +32,7 @@ export interface AdminNavItem {
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard, exact: true },
   { label: "Pedidos", href: "/admin/pedidos", icon: ShoppingBag },
+  { label: "Clientes", href: "/admin/clientes", icon: Users },
   { label: "Produtos", href: "/admin/produtos", icon: Package },
   { label: "Categorias", href: "/admin/categorias", icon: Tags },
   { label: "Marcas", href: "/admin/marcas", icon: Award },

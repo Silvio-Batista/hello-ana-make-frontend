@@ -8,6 +8,7 @@ import type {
 } from "./product.contract";
 import type { Promotion } from "./promotion.contract";
 import type { CartRewardGift } from "./reward.contract";
+import type { User } from "./auth.contract";
 
 /**
  * Métricas do painel administrativo (GET /admin/dashboard).
@@ -47,6 +48,40 @@ export interface UpdateOrderStatusRequest {
   trackingCode?: string;
   trackingUrl?: string;
   notes?: string;
+}
+
+/**
+ * Cliente no painel admin (GET /admin/customers).
+ */
+export interface AdminCustomer extends User {
+  ordersCount: number;
+}
+
+/**
+ * Filtros de listagem admin de clientes.
+ */
+export interface AdminCustomerListParams {
+  page?: number;
+  pageSize?: number;
+  /** Filtra por nome/e-mail (contains, case-insensitive). */
+  search?: string;
+}
+
+export interface AdminCustomerListResponse {
+  items: AdminCustomer[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+/**
+ * Resposta de upload de imagem (POST /admin/uploads).
+ */
+export interface UploadImageResponse {
+  url: string;
+  mimeType: string;
+  size: number;
 }
 
 /**

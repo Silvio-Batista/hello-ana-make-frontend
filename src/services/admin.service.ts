@@ -1,8 +1,12 @@
 import type {
+  AdminCustomer,
+  AdminCustomerListParams,
+  AdminCustomerListResponse,
   AdminDashboardStats,
   AdminOrderListParams,
   Category,
   CreateCategoryInput,
+  CreatePaymentResponse,
   CreatePromotionInput,
   Order,
   Promotion,
@@ -11,6 +15,7 @@ import type {
   UpdateCategoryInput,
   UpdateOrderStatusRequest,
   UpdatePromotionInput,
+  UploadImageResponse,
 } from "@/contracts";
 import type { OrderListResponse } from "@/repositories/interfaces";
 import {
@@ -52,8 +57,24 @@ export const adminService = {
     return orderRepository.updateStatus(id, request);
   },
 
+  refundOrder(id: string, amount?: number): Promise<CreatePaymentResponse> {
+    return orderRepository.refund(id, amount);
+  },
+
+  listCustomers(params?: AdminCustomerListParams): Promise<AdminCustomerListResponse> {
+    return adminRepository.listCustomers(params);
+  },
+
+  getCustomer(id: string): Promise<AdminCustomer | null> {
+    return adminRepository.getCustomerById(id);
+  },
+
+  uploadImage(file: File): Promise<UploadImageResponse> {
+    return adminRepository.uploadImage(file);
+  },
+
   listCategories(): Promise<Category[]> {
-    return categoryRepository.list();
+    return categoryRepository.list(true);
   },
 
   createCategory(input: CreateCategoryInput): Promise<Category> {

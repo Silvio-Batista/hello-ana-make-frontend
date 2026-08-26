@@ -1,10 +1,4 @@
-export {
-  calculateLineTotal,
-  calculateSubtotal,
-  getEligibleAmount,
-  getUnitLinePrice,
-  recalculateTotals,
-} from "./cart.service";
+export { cartService } from "./cart.service";
 export { couponService } from "./coupon.service";
 export { computeProgress, rewardService } from "./reward.service";
 export { shippingService } from "./shipping.service";

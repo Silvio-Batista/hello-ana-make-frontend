@@ -17,7 +17,19 @@ export {
   useCategoryChildren,
 } from "./use-categories";
 
-export { useCart, rewardKeys as cartRewardKeys } from "./use-cart";
+export {
+  cartKeys,
+  useCart,
+  useCartQuery,
+  useAddCartItem,
+  useUpdateCartItemQuantity,
+  useRemoveCartItem,
+  useClearCart,
+  useApplyCartCoupon,
+  useRemoveCartCoupon,
+  useSelectCartShipping,
+  rewardKeys as cartRewardKeys,
+} from "./use-cart";
 
 export { rewardKeys, useRewardProgress, useRewardTiers } from "./use-rewards";
 
@@ -46,6 +58,8 @@ export {
 } from "./use-orders";
 
 export { authKeys, useAuth, useSignupPromotion } from "./use-auth";
+
+export { useTokenizeCard } from "./use-payments";
 
 export { useValidateCoupon } from "./use-coupons";
 
