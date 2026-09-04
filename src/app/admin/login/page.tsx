@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
   const setSession = useAuthStore((s) => s.setSession);
   const logoutStore = useAuthStore((s) => s.logout);
 
-  const [email, setEmail] = useState("admin@helloana.make");
+  const [email, setEmail] = useState("admin@helloanamake.com");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -106,7 +106,7 @@ export default function AdminLoginPage() {
         </form>
 
         <p className="mt-6 text-center text-xs text-text-secondary">
-          Demo: admin@helloana.make / admin123
+          Demo: admin@helloanamake.com / admin123
         </p>
       </div>
     </div>

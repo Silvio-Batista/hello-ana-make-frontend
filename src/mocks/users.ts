@@ -30,7 +30,7 @@ export const users: User[] = [
   {
     id: "admin-001",
     name: "Admin Hello Ana",
-    email: "admin@helloana.make",
+    email: "admin@helloanamake.com",
     role: "admin",
     emailVerified: true,
     createdAt: "2025-01-01T00:00:00.000Z",
@@ -41,7 +41,7 @@ export const users: User[] = [
 export const mockPasswords: Record<string, string> = {
   "ana.silva@email.com": "helloana123",
   "marina.costa@email.com": "helloana123",
-  "admin@helloana.make": "admin123",
+  "admin@helloanamake.com": "admin123",
 };
 
 /** Usuários que ainda não finalizaram a primeira compra. */

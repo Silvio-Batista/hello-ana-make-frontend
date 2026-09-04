@@ -61,6 +61,19 @@ export default function CheckoutPage() {
     }
   }, [isCartLoading, items.length, step, confirmedOrder, router]);
 
+  // `step` mora no checkout store (zustand, sem persist) — sobrevive a navegações
+  // client-side dentro da mesma sessão. Sem isso, terminar um pedido deixa `step`
+  // travado em 5; abrir /checkout de novo pra um pedido novo monta com step=5 mas
+  // sem confirmedOrder desta vez (esse é local ao componente) — tela em branco,
+  // porque nenhum bloco de render cobre "step 5 sem confirmação". Só acontece uma
+  // vez, no mount, então não interfere com o fluxo normal de 1→5.
+  useEffect(() => {
+    if (step === 5 && !confirmedOrder) {
+      setStep(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSubmitOrder = async (cardPayment?: CardPaymentData) => {
     setSubmitError(null);
 
@@ -111,15 +124,13 @@ export default function CheckoutPage() {
               : undefined,
       });
 
-      await clearCart();
+      // Mostra a confirmação (QR code do PIX / boleto) antes de mais nada — limpar o
+      // carrinho é faxina, não deve travar a tela de pagamento se demorar/falhar.
       resetCheckout();
       setConfirmedOrder(result.order);
       setConfirmedPayment(result.payment ?? null);
       setStep(5);
-
-      if (isAuthenticated) {
-        router.push(`/conta/pedidos/${result.order.id}`);
-      }
+      void clearCart();
     } catch (err) {
       const message =
         err instanceof Error

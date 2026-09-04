@@ -31,6 +31,37 @@ const EMPTY_TOTALS: Cart["totals"] = {
 
 const EMPTY_ITEMS: Cart["items"] = [];
 
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+/**
+ * Atualiza quantidade/remoção no cache local na hora, sem esperar o servidor —
+ * o backend responde essas rotas em alguns segundos (round-trip pro Postgres),
+ * então sem isso cada clique de +/- trava a UI por 2-4s. `discount`/`shipping`
+ * ficam com o valor anterior (aproximação); `onSuccess` substitui pelo real.
+ */
+function withOptimisticQuantity(cart: Cart, itemId: string, quantity: number): Cart {
+  const items = cart.items.map((item) => {
+    if (item.id !== itemId) return item;
+    const unit = item.promotionalPrice ?? item.unitPrice;
+    return { ...item, quantity, lineTotal: round2(unit * quantity) };
+  });
+  return { ...cart, items, totals: recomputeTotals(cart, items) };
+}
+
+function withOptimisticRemove(cart: Cart, itemId: string): Cart {
+  const items = cart.items.filter((item) => item.id !== itemId);
+  return { ...cart, items, totals: recomputeTotals(cart, items) };
+}
+
+function recomputeTotals(cart: Cart, items: Cart["items"]): Cart["totals"] {
+  const subtotal = round2(items.reduce((sum, item) => sum + item.lineTotal, 0));
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const total = round2(Math.max(0, subtotal - cart.totals.discount + cart.totals.shipping));
+  return { ...cart.totals, subtotal, itemCount, total };
+}
+
 export function useCartQuery() {
   // Numa carga fria, a sessão persistida (Zustand) ainda não reidratou do
   // localStorage no primeiro render — buscar o carrinho antes disso manda a
@@ -45,10 +76,32 @@ export function useCartQuery() {
   });
 }
 
-function useCartMutation<TVars>(mutationFn: (vars: TVars) => Promise<Cart>) {
+interface OptimisticCartContext {
+  previous?: Cart;
+}
+
+function useCartMutation<TVars>(
+  mutationFn: (vars: TVars) => Promise<Cart>,
+  optimisticUpdate?: (cart: Cart, vars: TVars) => Cart,
+) {
   const qc = useQueryClient();
-  return useMutation({
+  return useMutation<Cart, Error, TVars, OptimisticCartContext>({
     mutationFn,
+    onMutate: optimisticUpdate
+      ? async (vars) => {
+          await qc.cancelQueries({ queryKey: cartKeys.detail() });
+          const previous = qc.getQueryData<Cart>(cartKeys.detail());
+          if (previous) {
+            qc.setQueryData(cartKeys.detail(), optimisticUpdate(previous, vars));
+          }
+          return { previous };
+        }
+      : undefined,
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        qc.setQueryData(cartKeys.detail(), context.previous);
+      }
+    },
     onSuccess: (cart) => {
       qc.setQueryData(cartKeys.detail(), cart);
       void qc.invalidateQueries({ queryKey: rewardKeys.all });
@@ -61,13 +114,18 @@ export function useAddCartItem() {
 }
 
 export function useUpdateCartItemQuantity() {
-  return useCartMutation(({ itemId, quantity }: { itemId: string; quantity: number }) =>
-    cartService.updateItemQuantity(itemId, quantity),
+  return useCartMutation(
+    ({ itemId, quantity }: { itemId: string; quantity: number }) =>
+      cartService.updateItemQuantity(itemId, quantity),
+    (cart, { itemId, quantity }) => withOptimisticQuantity(cart, itemId, quantity),
   );
 }
 
 export function useRemoveCartItem() {
-  return useCartMutation((itemId: string) => cartService.removeItem(itemId));
+  return useCartMutation(
+    (itemId: string) => cartService.removeItem(itemId),
+    (cart, itemId) => withOptimisticRemove(cart, itemId),
+  );
 }
 
 export function useClearCart() {

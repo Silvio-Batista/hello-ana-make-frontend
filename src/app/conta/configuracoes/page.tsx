@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, Checkbox, Input } from "@/components/ui";
 import { useAuth } from "@/hooks";
 import { authRepository } from "@/lib/container";
+import { formatCpfCnpj } from "@/lib/order-status";
 import { useAuthStore } from "@/stores";
 
 export default function ConfiguracoesPage() {
@@ -15,6 +16,7 @@ export default function ConfiguracoesPage() {
 
   const [name, setName] = useState(user?.name ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
+  const [document, setDocument] = useState(user?.document ?? "");
   const [marketing, setMarketing] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +25,7 @@ export default function ConfiguracoesPage() {
   useEffect(() => {
     setName(user?.name ?? "");
     setPhone(user?.phone ?? "");
+    setDocument(user?.document ?? "");
   }, [user]);
 
   const onSubmit = async (event: FormEvent) => {
@@ -34,6 +37,7 @@ export default function ConfiguracoesPage() {
       const updated = await authRepository.updateProfile({
         name: name.trim(),
         phone: phone.trim() || undefined,
+        document: document.replace(/\D/g, "") || undefined,
       });
       if (session) {
         setSession({ ...session, user: updated });
@@ -77,6 +81,15 @@ export default function ConfiguracoesPage() {
           name="phone"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+        />
+        <Input
+          label="CPF/CNPJ"
+          name="document"
+          value={document}
+          onChange={(e) => setDocument(formatCpfCnpj(e.target.value))}
+          inputMode="numeric"
+          placeholder="000.000.000-00"
+          hint="Obrigatório para pagar com PIX, boleto ou cartão."
         />
         <Checkbox
           name="marketing"

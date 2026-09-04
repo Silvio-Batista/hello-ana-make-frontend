@@ -3,7 +3,7 @@
 import type { MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Plus } from "lucide-react";
+import { Heart, Loader2, Plus } from "lucide-react";
 import type { Product, ProductBadge as ProductBadgeType } from "@/contracts";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { PriceDisplay } from "@/components/ui/price-display";
@@ -161,7 +161,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           <button
             type="button"
             onClick={handleQuickAdd}
-            disabled={!product.inventory.isInStock}
+            disabled={!product.inventory.isInStock || addItem.isPending}
             className={cn(
               "mt-2 inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-xl",
               "bg-primary-light text-sm font-medium text-primary-dark",
@@ -169,7 +169,11 @@ export function ProductCard({ product, className }: ProductCardProps) {
               "disabled:pointer-events-none disabled:opacity-50",
             )}
           >
-            <Plus className="size-4" aria-hidden />
+            {addItem.isPending ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+            ) : (
+              <Plus className="size-4" aria-hidden />
+            )}
             Adicionar
           </button>
         ) : (

@@ -161,6 +161,7 @@ export function ProductInfo({ product, className }: ProductInfoProps) {
           leftIcon={<ShoppingBag className="size-4" aria-hidden />}
           onClick={handleAddToCart}
           disabled={!inStock}
+          loading={addItem.isPending}
         >
           Adicionar ao carrinho
         </Button>
