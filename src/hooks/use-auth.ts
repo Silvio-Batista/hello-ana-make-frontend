@@ -49,6 +49,11 @@ export function useAuth() {
       authService.forgotPassword(request),
   });
 
+  const resetPasswordMutation = useMutation({
+    mutationFn: ({ token, newPassword }: { token: string; newPassword: string }) =>
+      authService.resetPassword(token, newPassword),
+  });
+
   return {
     user,
     session,
@@ -58,6 +63,7 @@ export function useAuth() {
     register: registerMutation,
     logout: logoutMutation,
     forgotPassword: forgotPasswordMutation,
+    resetPassword: resetPasswordMutation,
   };
 }
 

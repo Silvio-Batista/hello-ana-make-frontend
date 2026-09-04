@@ -24,6 +24,10 @@ export const authService = {
     return authRepository.forgotPassword(request);
   },
 
+  resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    return authRepository.resetPassword(token, newPassword);
+  },
+
   getSignupPromotion(): Promise<SignupPromotionResponse | null> {
     return authRepository.getSignupPromotion();
   },
