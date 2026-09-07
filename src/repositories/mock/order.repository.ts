@@ -59,7 +59,9 @@ export function getMockOrderStore(): Order[] {
 }
 
 export class MockOrderRepository implements OrderRepository {
-  async create(request: CreateOrderRequest): Promise<Order> {
+  async create(
+    request: CreateOrderRequest,
+  ): Promise<{ order: Order; payment?: CreatePaymentResponse }> {
     await delay();
     const userId = requireCurrentUserId();
     const shippingAddress = addresses.find(
@@ -132,7 +134,7 @@ export class MockOrderRepository implements OrderRepository {
 
     orderSeq += 1;
     orderStore.unshift(order);
-    return order;
+    return { order };
   }
 
   async getById(id: string): Promise<Order | null> {

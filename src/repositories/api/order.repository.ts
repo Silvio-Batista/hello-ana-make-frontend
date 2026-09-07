@@ -13,12 +13,8 @@ import type {
 import { apiGet, apiPatch, apiPost, getOrNull } from "@/lib/http-client";
 
 export class ApiOrderRepository implements OrderRepository {
-  async create(request: CreateOrderRequest): Promise<Order> {
-    const { order } = await apiPost<{ order: Order; payment?: CreatePaymentResponse }>(
-      "/orders",
-      request,
-    );
-    return order;
+  create(request: CreateOrderRequest): Promise<{ order: Order; payment?: CreatePaymentResponse }> {
+    return apiPost<{ order: Order; payment?: CreatePaymentResponse }>("/orders", request);
   }
 
   getById(id: string): Promise<Order | null> {

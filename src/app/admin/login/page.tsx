@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button, Input } from "@/components/ui";
-import { adminRepository } from "@/lib/container";
+import { adminRepository, isMockDataSource } from "@/lib/container";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/stores";
 
@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
   const setSession = useAuthStore((s) => s.setSession);
   const logoutStore = useAuthStore((s) => s.logout);
 
-  const [email, setEmail] = useState("admin@helloanamake.com");
+  const [email, setEmail] = useState(isMockDataSource ? "admin@helloanamake.com" : "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -105,9 +105,11 @@ export default function AdminLoginPage() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-xs text-text-secondary">
-          Demo: admin@helloanamake.com / admin123
-        </p>
+        {isMockDataSource ? (
+          <p className="mt-6 text-center text-xs text-text-secondary">
+            Demo: admin@helloanamake.com / admin123
+          </p>
+        ) : null}
       </div>
     </div>
   );

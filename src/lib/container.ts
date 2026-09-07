@@ -52,6 +52,9 @@ import {
 
 const useApi = process.env.NEXT_PUBLIC_DATA_SOURCE === "api";
 
+/** Uso em UI: esconder credenciais/atalhos de demo quando falando com o backend real. */
+export const isMockDataSource = !useApi;
+
 export const productRepository: ProductRepository = useApi
   ? new ApiProductRepository()
   : new MockProductRepository();

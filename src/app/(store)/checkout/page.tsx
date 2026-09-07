@@ -20,6 +20,7 @@ import {
   useCreateAddress,
   useCreateOrder,
 } from "@/hooks";
+import { isMockDataSource } from "@/lib/container";
 import { useCheckoutStore } from "@/stores";
 
 export default function CheckoutPage() {
@@ -138,7 +139,9 @@ export default function CheckoutPage() {
           : "Não foi possível criar o pedido.";
       if (message.includes("não autenticado") || message.includes("autenticado")) {
         setSubmitError(
-          "Faça login para finalizar o pedido. Demo: ana.silva@email.com / helloana123",
+          isMockDataSource
+            ? "Faça login para finalizar o pedido. Demo: ana.silva@email.com / helloana123"
+            : "Faça login para finalizar o pedido.",
         );
         setStep(1);
       } else {

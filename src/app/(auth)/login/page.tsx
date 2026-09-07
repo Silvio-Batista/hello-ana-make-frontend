@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Checkbox, Input, Spinner } from "@/components/ui";
 import { useAuth } from "@/hooks";
+import { isMockDataSource } from "@/lib/container";
 
 function LoginForm() {
   const router = useRouter();
@@ -12,7 +13,7 @@ function LoginForm() {
   const redirectTo = searchParams.get("redirect") || "/conta";
   const { login, isAuthenticated, hasHydrated } = useAuth();
 
-  const [email, setEmail] = useState("ana.silva@email.com");
+  const [email, setEmail] = useState(isMockDataSource ? "ana.silva@email.com" : "");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -98,9 +99,11 @@ function LoginForm() {
           Cadastre-se
         </Link>
       </p>
-      <p className="mt-3 text-center text-xs text-text-secondary">
-        Demo: ana.silva@email.com / helloana123
-      </p>
+      {isMockDataSource ? (
+        <p className="mt-3 text-center text-xs text-text-secondary">
+          Demo: ana.silva@email.com / helloana123
+        </p>
+      ) : null}
     </>
   );
 }

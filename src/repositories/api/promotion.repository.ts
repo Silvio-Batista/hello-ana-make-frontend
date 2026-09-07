@@ -17,12 +17,20 @@ export class ApiPromotionRepository implements PromotionRepository {
   }
 
   async listAll(): Promise<Promotion[]> {
-    const { items } = await apiGet<{ items: Promotion[] }>(
-      "/promotions",
-      { activeOnly: false },
-      { auth: false },
-    );
-    return items;
+    // Uso admin: /promotions é público e activeOnly=false exporia promoções inativas/futuras
+    // sem autenticação, então a listagem completa vem da rota protegida (Bearer + role=admin).
+    const all: Promotion[] = [];
+    let page = 1;
+    for (;;) {
+      const { items, totalPages } = await apiGet<{
+        items: Promotion[];
+        totalPages: number;
+      }>("/admin/promotions", { page, pageSize: 100 });
+      all.push(...items);
+      if (page >= totalPages) break;
+      page += 1;
+    }
+    return all;
   }
 
   async getById(id: string): Promise<Promotion | null> {

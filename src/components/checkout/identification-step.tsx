@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Button, Checkbox, Input } from "@/components/ui";
 import { useAuth } from "@/hooks";
+import { isMockDataSource } from "@/lib/container";
 import { useCheckoutStore } from "@/stores";
 
 export function IdentificationStep() {
@@ -206,7 +207,7 @@ export function IdentificationStep() {
             Entrar e continuar
           </Button>
           <p className="text-center text-xs text-text-secondary">
-            Demo: ana.silva@email.com / helloana123 ·{" "}
+            {isMockDataSource ? "Demo: ana.silva@email.com / helloana123 · " : null}
             <Link
               href="/recuperar-senha"
               className="font-medium text-primary hover:underline"

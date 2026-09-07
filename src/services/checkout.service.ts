@@ -26,7 +26,12 @@ export async function createOrder(
   request: CreateOrderRequest,
   payment?: CreateOrderPayment,
 ): Promise<CheckoutResult> {
-  const order = await orderRepository.create(request);
+  const { order, payment: initialPayment } = await orderRepository.create(request);
+
+  // pix/boleto: o backend já abre a cobrança na criação do pedido — não repetir POST /payments.
+  if (initialPayment) {
+    return { order, payment: initialPayment };
+  }
 
   if (!payment) {
     return { order };

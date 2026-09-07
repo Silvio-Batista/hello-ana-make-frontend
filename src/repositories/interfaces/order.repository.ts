@@ -31,7 +31,8 @@ export interface OrderListResponse {
  * Repositório de pedidos.
  */
 export interface OrderRepository {
-  create(request: CreateOrderRequest): Promise<Order>;
+  /** payment vem preenchido quando o backend já abre a cobrança na criação (pix/boleto). */
+  create(request: CreateOrderRequest): Promise<{ order: Order; payment?: CreatePaymentResponse }>;
   getById(id: string): Promise<Order | null>;
   getByOrderNumber(orderNumber: string): Promise<Order | null>;
   listMine(params?: OrderListParams): Promise<OrderListResponse>;

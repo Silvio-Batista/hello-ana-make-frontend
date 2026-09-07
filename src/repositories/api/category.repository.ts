@@ -8,9 +8,26 @@ import { apiDelete, apiGet, apiPost, apiPut, getOrNull } from "@/lib/http-client
 
 export class ApiCategoryRepository implements CategoryRepository {
   async list(includeInactive = false): Promise<Category[]> {
+    // includeInactive é uso admin: GET /categories é público e sem esse filtro documentado
+    // no contrato, então categorias inativas vêm só da rota protegida (Bearer + role=admin).
+    if (includeInactive) {
+      const all: Category[] = [];
+      let page = 1;
+      for (;;) {
+        const { items, totalPages } = await apiGet<{
+          items: Category[];
+          totalPages: number;
+        }>("/admin/categories", { page, pageSize: 100 });
+        all.push(...items);
+        if (page >= totalPages) break;
+        page += 1;
+      }
+      return all;
+    }
+
     const { items } = await apiGet<{ items: Category[] }>(
       "/categories",
-      { tree: false, includeInactive },
+      { tree: false },
       { auth: false },
     );
     return items;
