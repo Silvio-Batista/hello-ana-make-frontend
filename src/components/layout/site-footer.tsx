@@ -20,6 +20,7 @@ const HELP_LINKS = [
   { label: "Frete e entrega", href: "/ajuda/frete" },
   { label: "Formas de pagamento", href: "/ajuda/pagamento" },
   { label: "Política de privacidade", href: "/privacidade" },
+  { label: "Política de cookies", href: "/cookies" },
   { label: "Termos de uso", href: "/termos" },
 ] as const;
 

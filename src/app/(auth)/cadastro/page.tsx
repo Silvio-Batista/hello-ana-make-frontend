@@ -106,7 +106,26 @@ export default function CadastroPage() {
           name="acceptTerms"
           checked={acceptTerms}
           onChange={(e) => setAcceptTerms(e.target.checked)}
-          label="Aceito os termos de uso e a política de privacidade"
+          label={
+            <>
+              Aceito os{" "}
+              <Link
+                href="/termos"
+                target="_blank"
+                className="font-medium text-primary hover:underline"
+              >
+                termos de uso
+              </Link>{" "}
+              e a{" "}
+              <Link
+                href="/privacidade"
+                target="_blank"
+                className="font-medium text-primary hover:underline"
+              >
+                política de privacidade
+              </Link>
+            </>
+          }
         />
         <Checkbox
           name="acceptMarketing"

@@ -12,3 +12,8 @@ export {
   SignupPromoModal,
   type SignupPromoModalProps,
 } from "./signup-promo-modal";
+export {
+  PolicySection,
+  PlaceholderNotice,
+  type PolicySectionProps,
+} from "./policy-content";
