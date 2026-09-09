@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  type ReactNode,
-} from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,11 +27,25 @@ export function Modal({
   const descId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  // Depende só de `open` de propósito: `onClose` quase sempre chega como uma arrow
+  // function nova a cada render do chamador, e se entrasse nas deps aqui o efeito
+  // reexecutaria a cada digitação num campo do formulário, roubando o foco de volta
+  // pro primeiro elemento focável do modal (o botão de fechar) a cada tecla.
+  useEffect(() => {
+    if (!open) return;
+
+    previousFocus.current = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -58,15 +66,8 @@ export function Modal({
         event.preventDefault();
         first.focus();
       }
-    },
-    [onClose],
-  );
+    };
 
-  useEffect(() => {
-    if (!open) return;
-
-    previousFocus.current = document.activeElement as HTMLElement | null;
-    document.body.style.overflow = "hidden";
     document.addEventListener("keydown", handleKeyDown);
 
     const timer = window.setTimeout(() => {
@@ -83,7 +84,7 @@ export function Modal({
       document.removeEventListener("keydown", handleKeyDown);
       previousFocus.current?.focus();
     };
-  }, [open, handleKeyDown]);
+  }, [open]);
 
   if (!open) return null;
 
