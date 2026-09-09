@@ -14,6 +14,10 @@ export {
 } from "./signup-promo-modal";
 export {
   PolicySection,
-  PlaceholderNotice,
   type PolicySectionProps,
 } from "./policy-content";
+export {
+  CookieConsentBanner,
+  COOKIE_CONSENT_RESET_EVENT,
+} from "./cookie-consent-banner";
+export { CookieConsentReviewButton } from "./cookie-consent-review-button";

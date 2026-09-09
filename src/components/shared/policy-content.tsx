@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { AlertTriangle } from "lucide-react";
 
 export interface PolicySectionProps {
   title: string;
@@ -17,18 +16,5 @@ export function PolicySection({ title, children }: PolicySectionProps) {
         {children}
       </div>
     </section>
-  );
-}
-
-/**
- * Aviso de que o texto abaixo é placeholder — usado nas páginas com implicação
- * jurídica (termos, privacidade, cookies) até serem revisadas/substituídas.
- */
-export function PlaceholderNotice({ children }: { children: ReactNode }) {
-  return (
-    <div className="mb-8 flex gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-      <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
-      <p>{children}</p>
-    </div>
   );
 }

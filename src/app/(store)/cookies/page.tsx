@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { PageHeader, PlaceholderNotice, PolicySection } from "@/components/shared";
+import {
+  CookieConsentReviewButton,
+  PageHeader,
+  PolicySection,
+} from "@/components/shared";
 import { Container } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -17,14 +21,6 @@ export default function PoliticaDeCookiesPage() {
         description={`Última atualização: ${LAST_UPDATED}`}
       />
       <Container size="sm" className="py-10 md:py-14">
-        <PlaceholderNotice>
-          Texto placeholder gerado automaticamente — <strong>não é assessoria
-          jurídica</strong>. Revise antes de operar com clientes reais,
-          especialmente se adicionar cookies de analytics/anúncios (ex.: Meta
-          Pixel, Google Analytics), que normalmente exigem banner de
-          consentimento.
-        </PlaceholderNotice>
-
         <PolicySection title="1. O que são cookies">
           <p>
             Cookies são pequenos arquivos armazenados no seu navegador que
@@ -47,17 +43,21 @@ export default function PoliticaDeCookiesPage() {
           </ul>
           <p>
             Hoje não utilizamos cookies de publicidade/rastreamento de
-            terceiros. Se isso mudar, esta política e um banner de
-            consentimento serão adicionados antes da ativação.
+            terceiros. Se isso mudar, esta política será atualizada antes da
+            ativação.
           </p>
         </PolicySection>
 
         <PolicySection title="3. Como gerenciar cookies">
           <p>
-            Você pode bloquear ou apagar cookies nas configurações do seu
-            navegador a qualquer momento. Bloquear cookies essenciais pode
-            impedir o funcionamento do carrinho e do login.
+            Ao visitar o Site pela primeira vez, você escolhe se aceita ou
+            rejeita os cookies não essenciais no banner exibido. Você pode
+            mudar de ideia a qualquer momento clicando no botão abaixo, ou
+            bloquear/apagar cookies diretamente nas configurações do seu
+            navegador. Bloquear cookies essenciais pode impedir o
+            funcionamento do carrinho e do login.
           </p>
+          <CookieConsentReviewButton />
         </PolicySection>
 
         <PolicySection title="4. Mais informações">

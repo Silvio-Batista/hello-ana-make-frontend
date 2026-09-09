@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PageHeader, PlaceholderNotice, PolicySection } from "@/components/shared";
+import { PageHeader, PolicySection } from "@/components/shared";
 import { Container } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -17,13 +17,6 @@ export default function TermosDeUsoPage() {
         description={`Última atualização: ${LAST_UPDATED}`}
       />
       <Container size="sm" className="py-10 md:py-14">
-        <PlaceholderNotice>
-          Texto placeholder gerado automaticamente — <strong>não é assessoria
-          jurídica</strong>. Revise e substitua pelo conteúdo definitivo (com
-          um advogado ou modelo próprio da empresa) antes de operar com
-          clientes reais.
-        </PlaceholderNotice>
-
         <PolicySection title="1. Aceitação dos termos">
           <p>
             Ao acessar e utilizar o site Hello Ana Make (&quot;Site&quot;), você

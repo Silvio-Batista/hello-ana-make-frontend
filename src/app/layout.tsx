@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Outfit, Great_Vibes } from "next/font/google";
 import { AppProviders } from "@/providers/app-providers";
+import { CookieConsentBanner } from "@/components/shared";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-background font-sans text-text-primary">
         <AppProviders>{children}</AppProviders>
+        <CookieConsentBanner />
       </body>
     </html>
   );
