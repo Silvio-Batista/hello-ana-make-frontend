@@ -20,15 +20,8 @@ import {
   useProducts,
 } from "@/hooks/use-products";
 import { useRewardTiers } from "@/hooks/use-rewards";
-
-const INSTAGRAM_SEEDS = [
-  "ana-ig-1",
-  "ana-ig-2",
-  "ana-ig-3",
-  "ana-ig-4",
-  "ana-ig-5",
-  "ana-ig-6",
-] as const;
+import { useHomepageSettings } from "@/hooks/use-settings";
+import { useInstagramFeed } from "@/hooks/use-instagram";
 
 export default function HomePage() {
   const bestsellers = useBestsellers(8);
@@ -44,6 +37,8 @@ export default function HomePage() {
     sortBy: "bestseller",
   });
   const rewardTiers = useRewardTiers();
+  const homepageSettings = useHomepageSettings();
+  const instagramFeed = useInstagramFeed();
 
   const recommendedProducts =
     featured.data?.items && featured.data.items.length > 0
@@ -52,7 +47,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
-      <HeroSection />
+      <HeroSection image={homepageSettings.data?.heroImage} />
       <BenefitsSection />
       <CategoriesSection />
 
@@ -151,7 +146,10 @@ export default function HomePage() {
           <div className="relative overflow-hidden rounded-3xl bg-hero-mesh">
             <div className="absolute inset-0">
               <Image
-                src="https://picsum.photos/seed/hello-ana-campaign/1400/500"
+                src={
+                  homepageSettings.data?.campaignImage ||
+                  "https://picsum.photos/seed/hello-ana-campaign/1400/500"
+                }
                 alt=""
                 fill
                 className="object-cover opacity-35"
@@ -238,34 +236,43 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Instagram / community */}
-      <section className="py-14 md:py-16">
-        <Container>
-          <SectionHeading
-            align="center"
-            eyebrow="Comunidade"
-            title="@helloanamake"
-            subtitle="Looks reais, bastidores e inspirações do dia a dia."
-          />
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-6 md:gap-3">
-            {INSTAGRAM_SEEDS.map((seed, index) => (
-              <li
-                key={seed}
-                className="animate-fade-up relative aspect-square overflow-hidden rounded-2xl bg-nude"
-                style={{ animationDelay: `${index * 60}ms` }}
-              >
-                <Image
-                  src={`https://picsum.photos/seed/${seed}/400/400`}
-                  alt={`Look da comunidade Hello Ana Make ${index + 1}`}
-                  fill
-                  className="object-cover transition-transform duration-500 hover:scale-105"
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 16vw"
-                />
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </section>
+      {/* Instagram / community — só aparece com feed real configurado (Admin > Integrações). */}
+      {instagramFeed.data && instagramFeed.data.length > 0 ? (
+        <section className="py-14 md:py-16">
+          <Container>
+            <SectionHeading
+              align="center"
+              eyebrow="Comunidade"
+              title="@helloanamake"
+              subtitle="Looks reais, bastidores e inspirações do dia a dia."
+            />
+            <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-6 md:gap-3">
+              {instagramFeed.data.map((item, index) => (
+                <li
+                  key={item.id}
+                  className="animate-fade-up relative aspect-square overflow-hidden rounded-2xl bg-nude"
+                  style={{ animationDelay: `${index * 60}ms` }}
+                >
+                  <a
+                    href={item.permalink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.caption || `Post da Hello Ana Make no Instagram ${index + 1}`}
+                      fill
+                      className="object-cover transition-transform duration-500 hover:scale-105"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 16vw"
+                    />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </Container>
+        </section>
+      ) : null}
     </div>
   );
 }

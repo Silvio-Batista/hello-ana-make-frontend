@@ -8,3 +8,5 @@ export type { CheckoutResult } from "./checkout.service";
 export { authService } from "./auth.service";
 export { brandService } from "./brand.service";
 export { adminService } from "./admin.service";
+export { settingsService } from "./settings.service";
+export { instagramService } from "./instagram.service";

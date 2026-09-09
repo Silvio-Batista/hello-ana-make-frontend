@@ -36,6 +36,11 @@ export const defaultStoreSettings: StoreSettings = {
     message: "Cadastre-se e ganhe 10% de desconto na primeira compra.",
     expiresAt: "2027-12-31T23:59:59.000Z",
   },
+  homepage: {
+    heroImage:
+      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1800&h=1200&fit=crop",
+    campaignImage: "https://picsum.photos/seed/hello-ana-campaign/1400/500",
+  },
   integrations: {
     paymentGateway: "mock",
     shippingProvider: "mock",

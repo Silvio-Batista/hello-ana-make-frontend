@@ -166,6 +166,14 @@ export interface StoreIntegrationsSettings {
   shippingProvider: string;
   asaasApiKey?: string;
   superfreteToken?: string;
+  instagramAccessToken?: string;
+  instagramUserId?: string;
+}
+
+/** Imagens da home (banner principal e banner de campanha). */
+export interface HomepageSettings {
+  heroImage: string;
+  campaignImage: string;
 }
 
 /**
@@ -209,6 +217,8 @@ export interface StoreSettings {
     message: string;
     expiresAt?: string;
   };
+  /** Imagens da home, editáveis pelo admin (Configurações > Página inicial). */
+  homepage: HomepageSettings;
   integrations: StoreIntegrationsSettings;
   currency: string;
   timezone: string;

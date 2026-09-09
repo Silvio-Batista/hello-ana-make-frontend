@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { PageHeader } from "@/components/admin";
+import { ImageUploadField, PageHeader } from "@/components/admin";
 import {
   Button,
   Checkbox,
@@ -46,12 +46,15 @@ export default function AdminSettingsPage() {
   const [shippingProvider, setShippingProvider] = useState("");
   const [asaasApiKey, setAsaasApiKey] = useState("");
   const [superfreteToken, setSuperfreteToken] = useState("");
+  const [instagramAccessToken, setInstagramAccessToken] = useState("");
+  const [instagramUserId, setInstagramUserId] = useState("");
 
   useEffect(() => {
     if (settings) {
       setForm(settings);
       setPaymentGateway(settings.integrations.paymentGateway);
       setShippingProvider(settings.integrations.shippingProvider);
+      setInstagramUserId(settings.integrations.instagramUserId ?? "");
     }
   }, [settings]);
 
@@ -65,6 +68,7 @@ export default function AdminSettingsPage() {
         shipping: form.shipping,
         rewards: form.rewards,
         signupPromotion: form.signupPromotion,
+        homepage: form.homepage,
         currency: form.currency,
         timezone: form.timezone,
       });
@@ -83,11 +87,16 @@ export default function AdminSettingsPage() {
       await updateIntegrations.mutateAsync({
         paymentGateway,
         shippingProvider,
+        instagramUserId,
         ...(asaasApiKey.trim() ? { asaasApiKey: asaasApiKey.trim() } : {}),
         ...(superfreteToken.trim() ? { superfreteToken: superfreteToken.trim() } : {}),
+        ...(instagramAccessToken.trim()
+          ? { instagramAccessToken: instagramAccessToken.trim() }
+          : {}),
       });
       setAsaasApiKey("");
       setSuperfreteToken("");
+      setInstagramAccessToken("");
       toast("Integrações atualizadas.", "success");
     } catch (err) {
       toast(
@@ -375,6 +384,37 @@ export default function AdminSettingsPage() {
           />
         </section>
 
+        <section className="space-y-4 border-t border-border pt-4">
+          <div>
+            <h3 className="text-sm font-semibold text-text-primary">
+              Página inicial
+            </h3>
+            <p className="mt-1 text-xs text-text-secondary">
+              Imagens exibidas no topo da home e no banner de campanha.
+            </p>
+          </div>
+          <ImageUploadField
+            label="Imagem do banner principal"
+            value={form.homepage.heroImage}
+            onChange={(heroImage) =>
+              setForm((prev) =>
+                prev ? { ...prev, homepage: { ...prev.homepage, heroImage } } : prev,
+              )
+            }
+          />
+          <ImageUploadField
+            label="Imagem do banner de campanha"
+            value={form.homepage.campaignImage}
+            onChange={(campaignImage) =>
+              setForm((prev) =>
+                prev
+                  ? { ...prev, homepage: { ...prev.homepage, campaignImage } }
+                  : prev,
+              )
+            }
+          />
+        </section>
+
         <section className="space-y-3 border-t border-border pt-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
@@ -450,6 +490,29 @@ export default function AdminSettingsPage() {
             }
           />
         </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input
+            label="Instagram User ID"
+            value={instagramUserId}
+            onChange={(e) => setInstagramUserId(e.target.value)}
+            placeholder="Id numérico da conta Business/Creator"
+          />
+          <Input
+            label="Instagram Access Token"
+            type="password"
+            value={instagramAccessToken}
+            onChange={(e) => setInstagramAccessToken(e.target.value)}
+            placeholder={
+              form.integrations.instagramAccessToken
+                ? "Já configurado — digite para substituir"
+                : "Não configurado"
+            }
+          />
+        </div>
+        <p className="text-xs text-text-secondary">
+          Sem Instagram User ID configurado, a seção &quot;Comunidade&quot; simplesmente não
+          aparece na home — nada quebra.
+        </p>
         <div className="flex justify-end pt-2">
           <Button type="submit" loading={updateIntegrations.isPending}>
             Salvar integrações

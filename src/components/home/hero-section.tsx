@@ -2,11 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+const DEFAULT_HERO_IMAGE =
+  "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1800&h=1200&fit=crop";
+
 export interface HeroSectionProps {
   className?: string;
+  /** Editável em Admin > Configurações > Página inicial; cai no placeholder padrão até lá. */
+  image?: string;
 }
 
-export function HeroSection({ className }: HeroSectionProps) {
+export function HeroSection({ className, image }: HeroSectionProps) {
   return (
     <section
       className={cn(
@@ -16,7 +21,7 @@ export function HeroSection({ className }: HeroSectionProps) {
     >
       <div className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1800&h=1200&fit=crop"
+          src={image || DEFAULT_HERO_IMAGE}
           alt="Maquiagem Hello Ana Make"
           fill
           priority

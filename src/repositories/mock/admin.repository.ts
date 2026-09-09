@@ -17,6 +17,11 @@ import { delay } from "@/repositories/utils";
 
 let settingsStore: StoreSettings = { ...defaultStoreSettings };
 
+/** Espelha getMockOrderStore — permite outros mocks (ex.: SettingsRepository) lerem o estado atual. */
+export function getMockSettingsStore(): StoreSettings {
+  return settingsStore;
+}
+
 const ORDER_STATUSES: OrderStatus[] = [
   "pending_payment",
   "paid",
@@ -51,6 +56,7 @@ function maskedSettings(): StoreSettings {
       ...settingsStore.integrations,
       asaasApiKey: maskSecret(settingsStore.integrations.asaasApiKey),
       superfreteToken: maskSecret(settingsStore.integrations.superfreteToken),
+      instagramAccessToken: maskSecret(settingsStore.integrations.instagramAccessToken),
     },
   };
 }
@@ -156,6 +162,8 @@ export class MockAdminRepository implements AdminRepository {
       shippingProvider: integrations.shippingProvider,
       asaasApiKey: maskSecret(integrations.asaasApiKey),
       superfreteToken: maskSecret(integrations.superfreteToken),
+      instagramUserId: integrations.instagramUserId,
+      instagramAccessToken: maskSecret(integrations.instagramAccessToken),
       updatedAt,
     };
   }

@@ -1,5 +1,7 @@
 export type { Brand } from "./brand.contract";
 
+export type { InstagramMediaItem } from "./instagram.contract";
+
 export type { Category } from "./category.contract";
 
 export type {
@@ -106,4 +108,5 @@ export type {
   UpdateRewardTierInput,
   StoreSettings,
   StoreIntegrationsSettings,
+  HomepageSettings,
 } from "./admin.contract";

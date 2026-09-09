@@ -11,7 +11,9 @@ import type {
   PaymentRepository,
   ProductRepository,
   PromotionRepository,
+  InstagramRepository,
   RewardRepository,
+  SettingsRepository,
   ShippingRepository,
 } from "@/repositories/interfaces";
 import {
@@ -28,6 +30,8 @@ import {
   ApiProductRepository,
   ApiPromotionRepository,
   ApiRewardRepository,
+  ApiInstagramRepository,
+  ApiSettingsRepository,
   AsaasPaymentGateway,
   MercadoPagoPaymentGateway,
   StripePaymentGateway,
@@ -47,6 +51,8 @@ import {
   MockProductRepository,
   MockPromotionRepository,
   MockRewardRepository,
+  MockInstagramRepository,
+  MockSettingsRepository,
   MockShippingRepository,
 } from "@/repositories/mock";
 
@@ -62,6 +68,14 @@ export const productRepository: ProductRepository = useApi
 export const cartRepository: CartRepository = useApi
   ? new ApiCartRepository()
   : new MockCartRepository();
+
+export const instagramRepository: InstagramRepository = useApi
+  ? new ApiInstagramRepository()
+  : new MockInstagramRepository();
+
+export const settingsRepository: SettingsRepository = useApi
+  ? new ApiSettingsRepository()
+  : new MockSettingsRepository();
 
 export const categoryRepository: CategoryRepository = useApi
   ? new ApiCategoryRepository()

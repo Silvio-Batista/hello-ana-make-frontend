@@ -12,3 +12,5 @@ export { MockPromotionRepository } from "./promotion.repository";
 export { MockFavoriteRepository } from "./favorite.repository";
 export { MockBrandRepository } from "./brand.repository";
 export { MockAdminRepository } from "./admin.repository";
+export { MockSettingsRepository } from "./settings.repository";
+export { MockInstagramRepository } from "./instagram.repository";

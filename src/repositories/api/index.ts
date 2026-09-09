@@ -20,3 +20,5 @@ export { ApiPromotionRepository } from "./promotion.repository";
 export { ApiFavoriteRepository } from "./favorite.repository";
 export { ApiBrandRepository } from "./brand.repository";
 export { ApiAdminRepository } from "./admin.repository";
+export { ApiSettingsRepository } from "./settings.repository";
+export { ApiInstagramRepository } from "./instagram.repository";
