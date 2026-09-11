@@ -102,10 +102,10 @@ export function SiteFooter() {
               <li className="flex items-center gap-2">
                 <Mail className="size-4 shrink-0 text-primary" aria-hidden />
                 <a
-                  href="mailto:ola@helloanamake.com.br"
+                  href="mailto:helloanamakeup@gmail.com"
                   className="hover:text-primary"
                 >
-                  ola@helloanamake.com.br
+                  helloanamakeup@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-2">

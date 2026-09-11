@@ -59,10 +59,10 @@ export default function AjudaPage() {
         <div className="mt-10 rounded-2xl border border-border bg-surface/60 p-6 text-sm text-text-secondary">
           Não achou sua resposta?{" "}
           <a
-            href="mailto:ola@helloanamake.com.br"
+            href="mailto:helloanamakeup@gmail.com"
             className="font-medium text-primary hover:underline"
           >
-            ola@helloanamake.com.br
+            helloanamakeup@gmail.com
           </a>{" "}
           ou (91) 98113-6250.
         </div>

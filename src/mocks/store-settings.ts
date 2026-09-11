@@ -4,7 +4,7 @@ import type { StoreSettings } from "@/contracts";
 export const defaultStoreSettings: StoreSettings = {
   store: {
     name: "Hello Ana Make",
-    email: "contato@helloanamake.com.br",
+    email: "helloanamakeup@gmail.com",
     phone: "5591981136250",
     instagramUrl: "https://instagram.com/helloanamake",
   },
