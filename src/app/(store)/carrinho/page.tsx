@@ -92,7 +92,9 @@ export default function CarrinhoPage() {
                         className="flex items-center gap-3 rounded-2xl border border-border bg-white p-3"
                       >
                         <Link
-                          href={`/produtos/${item.productSlug}`}
+                          href={`/produtos/
+                            
+                            ${item.productSlug}`}
                           className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-nude"
                         >
                           {item.image ? (

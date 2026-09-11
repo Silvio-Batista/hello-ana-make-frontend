@@ -34,6 +34,7 @@ export {
 export { rewardKeys, useRewardProgress, useRewardTiers } from "./use-rewards";
 export { settingsKeys, useHomepageSettings } from "./use-settings";
 export { instagramKeys, useInstagramFeed } from "./use-instagram";
+export { useNewsletterSubscribe } from "./use-newsletter";
 
 export {
   shippingKeys,

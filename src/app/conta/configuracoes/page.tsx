@@ -17,7 +17,7 @@ export default function ConfiguracoesPage() {
   const [name, setName] = useState(user?.name ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
   const [document, setDocument] = useState(user?.document ?? "");
-  const [marketing, setMarketing] = useState(true);
+  const [marketing, setMarketing] = useState(user?.acceptMarketing ?? true);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -26,6 +26,7 @@ export default function ConfiguracoesPage() {
     setName(user?.name ?? "");
     setPhone(user?.phone ?? "");
     setDocument(user?.document ?? "");
+    setMarketing(user?.acceptMarketing ?? true);
   }, [user]);
 
   const onSubmit = async (event: FormEvent) => {
@@ -38,6 +39,7 @@ export default function ConfiguracoesPage() {
         name: name.trim(),
         phone: phone.trim() || undefined,
         document: document.replace(/\D/g, "") || undefined,
+        acceptMarketing: marketing,
       });
       if (session) {
         setSession({ ...session, user: updated });

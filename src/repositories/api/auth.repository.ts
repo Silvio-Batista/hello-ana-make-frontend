@@ -51,7 +51,9 @@ export class ApiAuthRepository implements AuthRepository {
   }
 
   updateProfile(
-    data: Partial<Pick<User, "name" | "phone" | "document" | "avatarUrl" | "birthDate">>,
+    data: Partial<
+      Pick<User, "name" | "phone" | "document" | "avatarUrl" | "birthDate" | "acceptMarketing">
+    >,
   ): Promise<User> {
     return apiPatch<User>("/auth/me", data);
   }

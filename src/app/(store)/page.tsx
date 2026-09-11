@@ -22,6 +22,7 @@ import {
 import { useRewardTiers } from "@/hooks/use-rewards";
 import { useHomepageSettings } from "@/hooks/use-settings";
 import { useInstagramFeed } from "@/hooks/use-instagram";
+import { useNewsletterSubscribe } from "@/hooks/use-newsletter";
 
 export default function HomePage() {
   const bestsellers = useBestsellers(8);
@@ -39,6 +40,7 @@ export default function HomePage() {
   const rewardTiers = useRewardTiers();
   const homepageSettings = useHomepageSettings();
   const instagramFeed = useInstagramFeed();
+  const newsletterSubscribe = useNewsletterSubscribe();
 
   const recommendedProducts =
     featured.data?.items && featured.data.items.length > 0
@@ -232,6 +234,9 @@ export default function HomePage() {
           <NewsletterForm
             className="mx-auto max-w-lg"
             buttonLabel="Quero receber"
+            onSubmit={async (email) => {
+              await newsletterSubscribe.mutateAsync(email);
+            }}
           />
         </Container>
       </section>

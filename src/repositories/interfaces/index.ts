@@ -18,3 +18,4 @@ export type { BrandRepository } from "./brand.repository";
 export type { AdminRepository } from "./admin.repository";
 export type { SettingsRepository } from "./settings.repository";
 export type { InstagramRepository } from "./instagram.repository";
+export type { NewsletterRepository } from "./newsletter.repository";

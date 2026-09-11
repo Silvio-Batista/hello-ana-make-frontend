@@ -64,6 +64,7 @@ export class MockAuthRepository implements AuthRepository {
       birthDate: request.birthDate,
       role: "customer",
       emailVerified: false,
+      acceptMarketing: request.acceptMarketing ?? false,
       createdAt: now,
       updatedAt: now,
     };
@@ -99,7 +100,7 @@ export class MockAuthRepository implements AuthRepository {
 
   async updateProfile(
     data: Partial<
-      Pick<User, "name" | "phone" | "document" | "avatarUrl" | "birthDate">
+      Pick<User, "name" | "phone" | "document" | "avatarUrl" | "birthDate" | "acceptMarketing">
     >,
   ): Promise<User> {
     await delay();

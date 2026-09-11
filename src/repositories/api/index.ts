@@ -22,3 +22,4 @@ export { ApiBrandRepository } from "./brand.repository";
 export { ApiAdminRepository } from "./admin.repository";
 export { ApiSettingsRepository } from "./settings.repository";
 export { ApiInstagramRepository } from "./instagram.repository";
+export { ApiNewsletterRepository } from "./newsletter.repository";

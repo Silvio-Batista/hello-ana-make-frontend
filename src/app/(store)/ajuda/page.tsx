@@ -64,7 +64,7 @@ export default function AjudaPage() {
           >
             ola@helloanamake.com.br
           </a>{" "}
-          ou (11) 99999-0000.
+          ou (91) 98113-6250.
         </div>
       </Container>
     </>

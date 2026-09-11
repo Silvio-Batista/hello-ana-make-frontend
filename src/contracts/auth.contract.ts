@@ -12,6 +12,7 @@ export interface User {
   /** Não retornado pelo backend real hoje; populado apenas pelos dados mock. */
   role?: "customer" | "admin";
   emailVerified: boolean;
+  acceptMarketing: boolean;
   createdAt: string;
   updatedAt: string;
 }
