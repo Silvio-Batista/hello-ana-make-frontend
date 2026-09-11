@@ -94,6 +94,7 @@ export default function CarrinhoPage() {
                         <Link
                           href={`/produtos/
                             
+                            
                             ${item.productSlug}`}
                           className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-nude"
                         >
