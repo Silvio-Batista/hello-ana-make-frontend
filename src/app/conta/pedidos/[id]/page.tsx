@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { use } from "react";
-import { OrderTimeline } from "@/components/account";
-import { Badge, Button, ErrorState, Spinner } from "@/components/ui";
+import { use, useState } from "react";
+import { OrderTimeline, PendingPaymentPanel } from "@/components/account";
+import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { Badge, Button, ErrorState, Spinner, useToast } from "@/components/ui";
 import { useCancelOrder, useOrder } from "@/hooks";
 import {
   ORDER_STATUS_LABELS,
@@ -20,6 +21,8 @@ export default function PedidoDetalhePage({
   const { id } = use(params);
   const orderQuery = useOrder(id);
   const cancelOrder = useCancelOrder();
+  const { toast } = useToast();
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   if (orderQuery.isLoading) {
     return (
@@ -43,6 +46,22 @@ export default function PedidoDetalhePage({
   const canCancel = ["pending_payment", "paid", "processing"].includes(
     order.status,
   );
+  const awaitingPayment =
+    order.status === "pending_payment" &&
+    (order.paymentMethod === "pix" || order.paymentMethod === "boleto");
+
+  const handleCancel = async () => {
+    try {
+      await cancelOrder.mutateAsync({ id: order.id });
+      setConfirmCancel(false);
+      toast("Pedido cancelado.", "success");
+    } catch (err) {
+      toast(
+        err instanceof Error ? err.message : "Não foi possível cancelar o pedido.",
+        "error",
+      );
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -67,6 +86,8 @@ export default function PedidoDetalhePage({
 
       <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
         <div className="flex flex-col gap-6">
+          {awaitingPayment ? <PendingPaymentPanel order={order} /> : null}
+
           <section className="rounded-2xl border border-border bg-white p-5">
             <h3 className="mb-4 text-sm font-semibold text-text-primary">
               Status do pedido
@@ -182,19 +203,23 @@ export default function PedidoDetalhePage({
             <Button
               variant="outline"
               loading={cancelOrder.isPending}
-              onClick={() => {
-                if (
-                  window.confirm("Tem certeza que deseja cancelar este pedido?")
-                ) {
-                  void cancelOrder.mutateAsync({ id: order.id });
-                }
-              }}
+              onClick={() => setConfirmCancel(true)}
             >
               Cancelar pedido
             </Button>
           ) : null}
         </aside>
       </div>
+
+      <ConfirmDialog
+        open={confirmCancel}
+        onClose={() => setConfirmCancel(false)}
+        onConfirm={() => void handleCancel()}
+        title="Cancelar este pedido?"
+        description="O pedido será cancelado e o estoque devolvido. Essa ação não pode ser desfeita."
+        confirmLabel="Cancelar pedido"
+        loading={cancelOrder.isPending}
+      />
     </div>
   );
 }

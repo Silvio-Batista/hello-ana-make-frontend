@@ -61,7 +61,12 @@ export {
 
 export { authKeys, useAuth, useSignupPromotion } from "./use-auth";
 
-export { useTokenizeCard } from "./use-payments";
+export {
+  paymentKeys,
+  useTokenizeCard,
+  useCreatePayment,
+  usePayment,
+} from "./use-payments";
 
 export { useValidateCoupon } from "./use-coupons";
 
