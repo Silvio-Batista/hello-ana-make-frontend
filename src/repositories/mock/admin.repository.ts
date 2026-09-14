@@ -56,6 +56,8 @@ function maskedSettings(): StoreSettings {
       ...settingsStore.integrations,
       asaasApiKey: maskSecret(settingsStore.integrations.asaasApiKey),
       superfreteToken: maskSecret(settingsStore.integrations.superfreteToken),
+      mercadoPagoAccessToken: maskSecret(settingsStore.integrations.mercadoPagoAccessToken),
+      mercadoPagoWebhookSecret: maskSecret(settingsStore.integrations.mercadoPagoWebhookSecret),
       instagramAccessToken: maskSecret(settingsStore.integrations.instagramAccessToken),
     },
   };
@@ -162,6 +164,8 @@ export class MockAdminRepository implements AdminRepository {
       shippingProvider: integrations.shippingProvider,
       asaasApiKey: maskSecret(integrations.asaasApiKey),
       superfreteToken: maskSecret(integrations.superfreteToken),
+      mercadoPagoAccessToken: maskSecret(integrations.mercadoPagoAccessToken),
+      mercadoPagoWebhookSecret: maskSecret(integrations.mercadoPagoWebhookSecret),
       instagramUserId: integrations.instagramUserId,
       instagramAccessToken: maskSecret(integrations.instagramAccessToken),
       updatedAt,

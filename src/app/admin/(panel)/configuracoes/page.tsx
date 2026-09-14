@@ -46,6 +46,8 @@ export default function AdminSettingsPage() {
   const [shippingProvider, setShippingProvider] = useState("");
   const [asaasApiKey, setAsaasApiKey] = useState("");
   const [superfreteToken, setSuperfreteToken] = useState("");
+  const [mercadoPagoAccessToken, setMercadoPagoAccessToken] = useState("");
+  const [mercadoPagoWebhookSecret, setMercadoPagoWebhookSecret] = useState("");
   const [instagramAccessToken, setInstagramAccessToken] = useState("");
   const [instagramUserId, setInstagramUserId] = useState("");
 
@@ -90,12 +92,20 @@ export default function AdminSettingsPage() {
         instagramUserId,
         ...(asaasApiKey.trim() ? { asaasApiKey: asaasApiKey.trim() } : {}),
         ...(superfreteToken.trim() ? { superfreteToken: superfreteToken.trim() } : {}),
+        ...(mercadoPagoAccessToken.trim()
+          ? { mercadoPagoAccessToken: mercadoPagoAccessToken.trim() }
+          : {}),
+        ...(mercadoPagoWebhookSecret.trim()
+          ? { mercadoPagoWebhookSecret: mercadoPagoWebhookSecret.trim() }
+          : {}),
         ...(instagramAccessToken.trim()
           ? { instagramAccessToken: instagramAccessToken.trim() }
           : {}),
       });
       setAsaasApiKey("");
       setSuperfreteToken("");
+      setMercadoPagoAccessToken("");
+      setMercadoPagoWebhookSecret("");
       setInstagramAccessToken("");
       toast("Integrações atualizadas.", "success");
     } catch (err) {
@@ -459,7 +469,7 @@ export default function AdminSettingsPage() {
             label="Gateway de pagamento"
             value={paymentGateway}
             onChange={(e) => setPaymentGateway(e.target.value)}
-            placeholder="mock ou asaas"
+            placeholder="mock, asaas ou mercadopago"
           />
           <Input
             label="Provedor de frete"
@@ -485,6 +495,30 @@ export default function AdminSettingsPage() {
             onChange={(e) => setSuperfreteToken(e.target.value)}
             placeholder={
               form.integrations.superfreteToken
+                ? "Já configurado — digite para substituir"
+                : "Não configurado"
+            }
+          />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input
+            label="Access Token Mercado Pago"
+            type="password"
+            value={mercadoPagoAccessToken}
+            onChange={(e) => setMercadoPagoAccessToken(e.target.value)}
+            placeholder={
+              form.integrations.mercadoPagoAccessToken
+                ? "Já configurado — digite para substituir"
+                : "Não configurado"
+            }
+          />
+          <Input
+            label="Segredo do webhook Mercado Pago"
+            type="password"
+            value={mercadoPagoWebhookSecret}
+            onChange={(e) => setMercadoPagoWebhookSecret(e.target.value)}
+            placeholder={
+              form.integrations.mercadoPagoWebhookSecret
                 ? "Já configurado — digite para substituir"
                 : "Não configurado"
             }

@@ -166,6 +166,8 @@ export interface StoreIntegrationsSettings {
   shippingProvider: string;
   asaasApiKey?: string;
   superfreteToken?: string;
+  mercadoPagoAccessToken?: string;
+  mercadoPagoWebhookSecret?: string;
   instagramAccessToken?: string;
   instagramUserId?: string;
 }
