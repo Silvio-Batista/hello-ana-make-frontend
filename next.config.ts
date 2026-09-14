@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
       apiRemotePattern(),
       {
         protocol: "https",
-        hostname: "hello-ana-make-backend.onrender.com",
+        hostname: "hello-ana-make-backend-2.onrender.com",
       },
       // CDN das mídias reais do feed do Instagram (grid "Comunidade" da home).
       {
