@@ -11,3 +11,7 @@ export {
   ConfirmationStep,
   type ConfirmationStepProps,
 } from "./confirmation-step";
+export {
+  PaymentInstructions,
+  type PaymentInstructionsProps,
+} from "./payment-instructions";

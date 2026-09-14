@@ -2,6 +2,8 @@ export type { Brand } from "./brand.contract";
 
 export type { InstagramMediaItem } from "./instagram.contract";
 
+export type { NewsletterSubscribeResponse } from "./newsletter.contract";
+
 export type { Category } from "./category.contract";
 
 export type {

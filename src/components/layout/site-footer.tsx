@@ -1,8 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { NewsletterForm } from "@/components/shared/newsletter-form";
+import { useNewsletterSubscribe } from "@/hooks";
 
 const CATEGORY_LINKS = [
   { label: "Maquiagem", href: "/categorias/maquiagem" },
@@ -70,6 +73,7 @@ const SOCIAL_LINKS = [
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
+  const subscribe = useNewsletterSubscribe();
 
   return (
     <footer className="mt-auto border-t border-border bg-surface">
@@ -98,16 +102,16 @@ export function SiteFooter() {
               <li className="flex items-center gap-2">
                 <Mail className="size-4 shrink-0 text-primary" aria-hidden />
                 <a
-                  href="mailto:ola@helloanamake.com.br"
+                  href="mailto:helloanamakeup@gmail.com"
                   className="hover:text-primary"
                 >
-                  ola@helloanamake.com.br
+                  helloanamakeup@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="size-4 shrink-0 text-primary" aria-hidden />
-                <a href="tel:+5511999990000" className="hover:text-primary">
-                  (11) 99999-0000
+                <a href="tel:+5591981136250" className="hover:text-primary">
+                  (91) 98113-6250
                 </a>
               </li>
               <li className="flex items-start gap-2">
@@ -164,7 +168,12 @@ export function SiteFooter() {
               <p className="mb-3 text-sm text-text-secondary">
                 Receba lançamentos e ofertas exclusivas.
               </p>
-              <NewsletterForm buttonLabel="Assinar" />
+              <NewsletterForm
+                buttonLabel="Assinar"
+                onSubmit={async (email) => {
+                  await subscribe.mutateAsync(email);
+                }}
+              />
             </div>
             <div>
               <h3 className="mb-3 font-display text-base font-semibold text-text-primary">

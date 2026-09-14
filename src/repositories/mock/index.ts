@@ -14,3 +14,4 @@ export { MockBrandRepository } from "./brand.repository";
 export { MockAdminRepository } from "./admin.repository";
 export { MockSettingsRepository } from "./settings.repository";
 export { MockInstagramRepository } from "./instagram.repository";
+export { MockNewsletterRepository } from "./newsletter.repository";

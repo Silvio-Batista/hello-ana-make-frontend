@@ -54,10 +54,10 @@ export default function TrocasEDevolucoesPage() {
             </a>{" "}
             e localize o pedido, ou fale diretamente com a gente em{" "}
             <a
-              href="mailto:ola@helloanamake.com.br"
+              href="mailto:helloanamakeup@gmail.com"
               className="font-medium text-primary hover:underline"
             >
-              ola@helloanamake.com.br
+              helloanamakeup@gmail.com
             </a>{" "}
             informando o número do pedido e o motivo da troca/devolução.
           </p>

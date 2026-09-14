@@ -98,10 +98,10 @@ export default function TermosDeUsoPage() {
           <p>
             Dúvidas sobre estes termos? Fale conosco em{" "}
             <a
-              href="mailto:ola@helloanamake.com.br"
+              href="mailto:helloanamakeup@gmail.com"
               className="font-medium text-primary hover:underline"
             >
-              ola@helloanamake.com.br
+              helloanamakeup@gmail.com
             </a>
             .
           </p>

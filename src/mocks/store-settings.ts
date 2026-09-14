@@ -4,8 +4,8 @@ import type { StoreSettings } from "@/contracts";
 export const defaultStoreSettings: StoreSettings = {
   store: {
     name: "Hello Ana Make",
-    email: "contato@helloanamake.com.br",
-    phone: "5511999990000",
+    email: "helloanamakeup@gmail.com",
+    phone: "5591981136250",
     instagramUrl: "https://instagram.com/helloanamake",
   },
   checkout: {
@@ -15,7 +15,7 @@ export const defaultStoreSettings: StoreSettings = {
     allowGuestCheckout: false,
   },
   shipping: {
-    originZipCode: "01310100",
+    originZipCode: "66050350",
     defaultWeightGrams: 300,
     defaultWidthCm: 15,
     defaultHeightCm: 10,

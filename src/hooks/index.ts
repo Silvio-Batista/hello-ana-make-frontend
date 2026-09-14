@@ -34,6 +34,7 @@ export {
 export { rewardKeys, useRewardProgress, useRewardTiers } from "./use-rewards";
 export { settingsKeys, useHomepageSettings } from "./use-settings";
 export { instagramKeys, useInstagramFeed } from "./use-instagram";
+export { useNewsletterSubscribe } from "./use-newsletter";
 
 export {
   shippingKeys,
@@ -61,7 +62,12 @@ export {
 
 export { authKeys, useAuth, useSignupPromotion } from "./use-auth";
 
-export { useTokenizeCard } from "./use-payments";
+export {
+  paymentKeys,
+  useTokenizeCard,
+  useCreatePayment,
+  usePayment,
+} from "./use-payments";
 
 export { useValidateCoupon } from "./use-coupons";
 

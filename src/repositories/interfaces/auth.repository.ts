@@ -16,7 +16,11 @@ export interface AuthRepository {
   logout(): Promise<void>;
   refreshSession(refreshToken: string): Promise<AuthSession>;
   getCurrentUser(): Promise<User | null>;
-  updateProfile(data: Partial<Pick<User, "name" | "phone" | "document" | "avatarUrl" | "birthDate">>): Promise<User>;
+  updateProfile(
+    data: Partial<
+      Pick<User, "name" | "phone" | "document" | "avatarUrl" | "birthDate" | "acceptMarketing">
+    >,
+  ): Promise<User>;
   forgotPassword(request: ForgotPasswordRequest): Promise<{ message: string }>;
   resetPassword(token: string, newPassword: string): Promise<{ message: string }>;
   getSignupPromotion(): Promise<SignupPromotionResponse | null>;

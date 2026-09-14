@@ -12,6 +12,7 @@ import type {
   ProductRepository,
   PromotionRepository,
   InstagramRepository,
+  NewsletterRepository,
   RewardRepository,
   SettingsRepository,
   ShippingRepository,
@@ -31,6 +32,7 @@ import {
   ApiPromotionRepository,
   ApiRewardRepository,
   ApiInstagramRepository,
+  ApiNewsletterRepository,
   ApiSettingsRepository,
   AsaasPaymentGateway,
   MercadoPagoPaymentGateway,
@@ -52,6 +54,7 @@ import {
   MockPromotionRepository,
   MockRewardRepository,
   MockInstagramRepository,
+  MockNewsletterRepository,
   MockSettingsRepository,
   MockShippingRepository,
 } from "@/repositories/mock";
@@ -76,6 +79,10 @@ export const instagramRepository: InstagramRepository = useApi
 export const settingsRepository: SettingsRepository = useApi
   ? new ApiSettingsRepository()
   : new MockSettingsRepository();
+
+export const newsletterRepository: NewsletterRepository = useApi
+  ? new ApiNewsletterRepository()
+  : new MockNewsletterRepository();
 
 export const categoryRepository: CategoryRepository = useApi
   ? new ApiCategoryRepository()
@@ -147,6 +154,7 @@ export const container = {
   favoriteRepository,
   brandRepository,
   adminRepository,
+  newsletterRepository,
   paymentGateways,
 } as const;
 

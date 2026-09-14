@@ -51,10 +51,10 @@ export default function FreteEEntregaPage() {
           <p>
             Entre em contato em{" "}
             <a
-              href="mailto:ola@helloanamake.com.br"
+              href="mailto:helloanamakeup@gmail.com"
               className="font-medium text-primary hover:underline"
             >
-              ola@helloanamake.com.br
+              helloanamakeup@gmail.com
             </a>{" "}
             com o número do pedido — vamos verificar junto à transportadora e
             resolver o mais rápido possível.

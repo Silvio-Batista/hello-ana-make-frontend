@@ -65,10 +65,13 @@ export function ShippingStep() {
     }
   }, [quote.data, shippingOptionId, setShippingOptionId, zipCode]);
 
-  const continueNext = async () => {
+  // Não reenvia PUT /cart/shipping aqui: a opção já foi sincronizada (fire-and-forget)
+  // no clique que selecionou ela, ou pelo efeito de auto-seleção acima — repetir a
+  // chamada e esperar ela terminar só duplicava a espera (backend "frio" no Render
+  // deixava isso bem lento) e, sem trava no botão, um segundo clique nesse intervalo
+  // disparava nextStep() de novo, pulando direto pra etapa de pagamento.
+  const continueNext = () => {
     if (!shippingOptionId) return;
-    const option = quote.data?.options.find((o) => o.id === shippingOptionId);
-    if (option) await setShipping(option, zipCode);
     nextStep();
   };
 

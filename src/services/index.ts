@@ -10,3 +10,4 @@ export { brandService } from "./brand.service";
 export { adminService } from "./admin.service";
 export { settingsService } from "./settings.service";
 export { instagramService } from "./instagram.service";
+export { newsletterService } from "./newsletter.service";

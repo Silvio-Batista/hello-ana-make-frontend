@@ -60,10 +60,10 @@ export default function FormasDePagamentoPage() {
           <p>
             Fale com a gente em{" "}
             <a
-              href="mailto:ola@helloanamake.com.br"
+              href="mailto:helloanamakeup@gmail.com"
               className="font-medium text-primary hover:underline"
             >
-              ola@helloanamake.com.br
+              helloanamakeup@gmail.com
             </a>{" "}
             informando o número do pedido.
           </p>
