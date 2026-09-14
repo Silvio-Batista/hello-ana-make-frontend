@@ -260,7 +260,6 @@ export default function AdminCategoriesPage() {
             label="Imagem"
             value={form.image}
             onChange={(image) => setForm((prev) => ({ ...prev, image }))}
-            required
           />
           <Select
             label="Categoria pai (opcional)"
