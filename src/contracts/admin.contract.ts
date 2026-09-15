@@ -144,6 +144,8 @@ export interface CreateBrandInput {
   logo?: string;
   website?: string;
   isActive: boolean;
+  showInNavbar?: boolean;
+  navbarOrder?: number;
 }
 
 export interface UpdateBrandInput extends Partial<CreateBrandInput> {}

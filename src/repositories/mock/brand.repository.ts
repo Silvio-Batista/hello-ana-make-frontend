@@ -21,6 +21,11 @@ export class MockBrandRepository implements BrandRepository {
     return brandStore.find((b) => b.id === id) ?? null;
   }
 
+  async getBySlug(slug: string): Promise<Brand | null> {
+    await delay();
+    return brandStore.find((b) => b.slug === slug) ?? null;
+  }
+
   async create(input: CreateBrandInput): Promise<Brand> {
     await delay();
     const now = new Date().toISOString();
@@ -32,6 +37,8 @@ export class MockBrandRepository implements BrandRepository {
       logo: input.logo,
       website: input.website,
       isActive: input.isActive,
+      showInNavbar: input.showInNavbar ?? false,
+      navbarOrder: input.navbarOrder ?? 0,
       createdAt: now,
       updatedAt: now,
     };

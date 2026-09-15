@@ -30,6 +30,7 @@ export function ImageUploadField({
     try {
       const result = await uploadImage.mutateAsync(file);
       onChange(result.url);
+
       toast("Imagem enviada!", "success");
     } catch (err) {
       toast(

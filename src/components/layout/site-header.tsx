@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  ChevronDown,
   Heart,
   Menu,
   Search,
@@ -14,24 +15,47 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
+import { useBrands } from "@/hooks/use-brands";
 import { useCart } from "@/hooks/use-cart";
 import { cn } from "@/lib/utils";
 import { useAuthStore, useUiStore } from "@/stores";
-
-const NAV_CATEGORIES = [
-  { label: "Maquiagem", slug: "maquiagem" },
-  { label: "Olhos", slug: "olhos" },
-  { label: "Boca", slug: "boca" },
-  { label: "Rosto", slug: "rosto" },
-  { label: "Skincare", slug: "skincare" },
-  { label: "Kits", slug: "kits" },
-  { label: "Ofertas", slug: "ofertas" },
-] as const;
 
 export function SiteHeader() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  // Navbar por marca (não por categoria fixa) — curadoria do admin em Marcas
+  // ("mostrar no menu"/"ordem"), pra deixar quem entra pra comprar um batom, por
+  // exemplo, navegar pela marca em vez de ter que escolher entre olhos/boca/rosto.
+  const { data: brands } = useBrands();
+  const navBrands = (brands ?? [])
+    .filter((b) => b.showInNavbar)
+    .sort((a, b) => a.navbarOrder - b.navbarOrder);
+  // O resto das marcas (não destacadas no topo) fica atrás de "Outros" — dropdown no
+  // desktop, seção expansível no mobile — pra não sumir do menu quem não foi escolhida
+  // pro destaque, só não ocupar espaço logo de cara.
+  const otherBrands = (brands ?? [])
+    .filter((b) => !b.showInNavbar)
+    .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+  // Estados separados: o dropdown do desktop fecha ao clicar fora (via ref), a seção
+  // do mobile é só um acordeão dentro do menu que já está aberto — se os dois
+  // compartilhassem o mesmo estado, o listener de "clique fora" (que só conhece o
+  // DOM do desktop) fecharia e reabriria o próprio botão do mobile no mesmo clique.
+  const [otherOpen, setOtherOpen] = useState(false);
+  const [otherMobileOpen, setOtherMobileOpen] = useState(false);
+  const otherMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!otherOpen) return;
+    const onClickOutside = (event: MouseEvent) => {
+      if (!otherMenuRef.current?.contains(event.target as Node)) {
+        setOtherOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [otherOpen]);
+
   const mobileMenuOpen = useUiStore((s) => s.mobileMenuOpen);
   const searchOpen = useUiStore((s) => s.searchOpen);
   const toggleMobileMenu = useUiStore((s) => s.toggleMobileMenu);
@@ -39,6 +63,11 @@ export function SiteHeader() {
   const setSearchOpen = useUiStore((s) => s.setSearchOpen);
   const toggleMiniCart = useUiStore((s) => s.toggleMiniCart);
   const { itemCount } = useCart();
+
+  // Some ao fechar o menu mobile, senão reabrir mostra o acordeão ainda expandido.
+  useEffect(() => {
+    if (!mobileMenuOpen) setOtherMobileOpen(false);
+  }, [mobileMenuOpen]);
 
   const accountHref = isAuthenticated ? "/conta" : "/login";
 
@@ -84,20 +113,55 @@ export function SiteHeader() {
 
         <nav
           className="hidden items-center gap-1 lg:flex"
-          aria-label="Categorias"
+          aria-label="Marcas"
         >
-          {NAV_CATEGORIES.map((cat) => (
+          {navBrands.map((brand) => (
             <Link
-              key={cat.slug}
-              href={`/categorias/${cat.slug}`}
+              key={brand.slug}
+              href={`/marcas/${brand.slug}`}
               className={cn(
                 "rounded-lg px-2.5 py-1.5 text-sm font-medium text-text-secondary",
                 "transition-colors hover:bg-secondary hover:text-primary",
               )}
             >
-              {cat.label}
+              {brand.name}
             </Link>
           ))}
+          {otherBrands.length > 0 ? (
+            <div ref={otherMenuRef} className="relative">
+              <button
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={otherOpen}
+                onClick={() => setOtherOpen((v) => !v)}
+                className={cn(
+                  "flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-medium text-text-secondary",
+                  "transition-colors hover:bg-secondary hover:text-primary",
+                )}
+              >
+                Outros
+                <ChevronDown className="size-3.5" aria-hidden />
+              </button>
+              {otherOpen ? (
+                <div
+                  role="menu"
+                  className="absolute top-full left-0 z-50 mt-1 grid max-h-80 w-56 grid-cols-1 gap-0.5 overflow-y-auto rounded-xl border border-border bg-white p-1.5 shadow-lg"
+                >
+                  {otherBrands.map((brand) => (
+                    <Link
+                      key={brand.slug}
+                      href={`/marcas/${brand.slug}`}
+                      role="menuitem"
+                      onClick={() => setOtherOpen(false)}
+                      className="rounded-lg px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-secondary hover:text-primary"
+                    >
+                      {brand.name}
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </nav>
 
         <div className="flex items-center gap-0.5 sm:gap-1">
@@ -182,16 +246,49 @@ export function SiteHeader() {
                 aria-label="Buscar produtos"
               />
             </form>
-            {NAV_CATEGORIES.map((cat) => (
+            {navBrands.map((brand) => (
               <Link
-                key={cat.slug}
-                href={`/categorias/${cat.slug}`}
+                key={brand.slug}
+                href={`/marcas/${brand.slug}`}
                 className="rounded-xl px-3 py-2.5 text-sm font-medium text-text-primary transition-colors hover:bg-secondary"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {cat.label}
+                {brand.name}
               </Link>
             ))}
+            {otherBrands.length > 0 ? (
+              <div>
+                <button
+                  type="button"
+                  aria-expanded={otherMobileOpen}
+                  onClick={() => setOtherMobileOpen((v) => !v)}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-text-primary transition-colors hover:bg-secondary"
+                >
+                  Outros
+                  <ChevronDown
+                    className={cn("size-4 transition-transform", otherMobileOpen && "rotate-180")}
+                    aria-hidden
+                  />
+                </button>
+                {otherMobileOpen ? (
+                  <div className="flex flex-col gap-1 pl-3">
+                    {otherBrands.map((brand) => (
+                      <Link
+                        key={brand.slug}
+                        href={`/marcas/${brand.slug}`}
+                        className="rounded-xl px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-secondary"
+                        onClick={() => {
+                          setOtherMobileOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        {brand.name}
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
             <div className="mt-2 flex flex-col gap-1 border-t border-border pt-3">
               <Link
                 href={accountHref}

@@ -10,6 +10,7 @@ import type {
 export interface BrandRepository {
   list(): Promise<Brand[]>;
   getById(id: string): Promise<Brand | null>;
+  getBySlug(slug: string): Promise<Brand | null>;
   create(input: CreateBrandInput): Promise<Brand>;
   update(id: string, input: UpdateBrandInput): Promise<Brand>;
   remove(id: string): Promise<void>;

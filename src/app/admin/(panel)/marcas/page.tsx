@@ -34,6 +34,8 @@ interface BrandFormState {
   logo: string;
   website: string;
   isActive: boolean;
+  showInNavbar: boolean;
+  navbarOrder: string;
 }
 
 const emptyForm = (): BrandFormState => ({
@@ -43,6 +45,8 @@ const emptyForm = (): BrandFormState => ({
   logo: "",
   website: "",
   isActive: true,
+  showInNavbar: false,
+  navbarOrder: "0",
 });
 
 export default function AdminBrandsPage() {
@@ -71,6 +75,8 @@ export default function AdminBrandsPage() {
       logo: editing.logo ?? "",
       website: editing.website ?? "",
       isActive: editing.isActive,
+      showInNavbar: editing.showInNavbar,
+      navbarOrder: String(editing.navbarOrder),
     });
     setSlugTouched(true);
   }, [editing]);
@@ -91,6 +97,8 @@ export default function AdminBrandsPage() {
       logo: form.logo.trim() || undefined,
       website: form.website.trim() || undefined,
       isActive: form.isActive,
+      showInNavbar: form.showInNavbar,
+      navbarOrder: Number(form.navbarOrder) || 0,
     };
 
     try {
@@ -161,6 +169,16 @@ export default function AdminBrandsPage() {
           {row.isActive ? "Ativa" : "Inativa"}
         </Badge>
       ),
+    },
+    {
+      key: "navbar",
+      header: "Menu do topo",
+      render: (row) =>
+        row.showInNavbar ? (
+          <Badge variant="new">No menu (ordem {row.navbarOrder})</Badge>
+        ) : (
+          <span className="text-text-secondary">—</span>
+        ),
     },
     {
       key: "actions",
@@ -269,6 +287,25 @@ export default function AdminBrandsPage() {
               setForm((prev) => ({ ...prev, isActive: e.target.checked }))
             }
           />
+          <div className="flex items-end gap-3 rounded-xl border border-border bg-surface/50 p-3">
+            <Checkbox
+              label="Mostrar no menu do topo do site"
+              checked={form.showInNavbar}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, showInNavbar: e.target.checked }))
+              }
+            />
+            <Input
+              label="Ordem"
+              type="number"
+              value={form.navbarOrder}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, navbarOrder: e.target.value }))
+              }
+              className="w-20"
+              hint="Menor primeiro"
+            />
+          </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button
               type="button"

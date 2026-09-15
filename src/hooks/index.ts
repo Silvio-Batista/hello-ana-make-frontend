@@ -17,6 +17,8 @@ export {
   useCategoryChildren,
 } from "./use-categories";
 
+export { brandKeys, useBrands, useBrand } from "./use-brands";
+
 export {
   cartKeys,
   useCart,

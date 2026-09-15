@@ -4,7 +4,7 @@ import type {
   UpdateBrandInput,
 } from "@/contracts";
 import type { BrandRepository } from "@/repositories/interfaces";
-import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/http-client";
+import { apiDelete, apiGet, apiPost, apiPut, getOrNull } from "@/lib/http-client";
 
 export class ApiBrandRepository implements BrandRepository {
   async list(): Promise<Brand[]> {
@@ -17,6 +17,10 @@ export class ApiBrandRepository implements BrandRepository {
   async getById(id: string): Promise<Brand | null> {
     const items = await this.list();
     return items.find((b) => b.id === id) ?? null;
+  }
+
+  getBySlug(slug: string): Promise<Brand | null> {
+    return getOrNull<Brand>(`/brands/${slug}`, undefined, { auth: false });
   }
 
   create(input: CreateBrandInput): Promise<Brand> {
